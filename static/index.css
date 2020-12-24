@@ -1,0 +1,109 @@
+body{
+    margin: 0%;
+}
+#login_div{
+    position: absolute;
+    /* top: 10%; */
+    right: 5%;
+    width: 30%;
+    height: 100%;
+}
+
+#title{
+    position: absolute;
+    top: 35%;
+    right: 10%;
+}
+
+#username{
+    position: absolute;
+    top: 50%;
+    right: 10%;
+}
+
+#password{
+    position: absolute;
+    top: 60%;
+    right: 10%;
+}
+
+#signup{
+    position: absolute;
+    top: 70%;
+    right: 10%;
+}
+
+#submit{
+    position: absolute;
+    top: 75%;
+    right: 10%;
+}
+
+
+/* @import url(https://fonts.googleapis.com/css?family=Open+Sans:600); */
+
+#bg_div{
+    position: absolute;
+    z-index: -1;
+    top: 0%;
+    left: 0%;
+    clip-path: circle(71.1% at 0 51%);
+    width: 110%;
+    height: 100%;
+    background: rgb(94,0,199);
+    background: linear-gradient(63deg, rgba(94,0,199,1) 0%, rgba(139,74,247,1) 27%, rgba(127,216,245,1) 58%, rgba(0,198,255,1) 100%);
+}
+/* #text_div{
+    position: absolute;
+    top: 20%;
+    color: #ffffff;
+    z-index: 7;
+    width: 50%;
+    height: 50%;
+} */
+.item-1, 
+.item-2, 
+.item-3 {
+	position: absolute;
+  display: block;
+	top: 7em;
+  color: #ffffff;
+  font-weight: bold;
+  width: 50%;
+  
+  font-size: 2em;
+
+	animation-duration: 50s;
+	animation-timing-function: ease-in-out;
+	animation-iteration-count: infinite;
+}
+
+.item-1{
+	animation-name: anim-1;
+}
+
+.item-2{
+	animation-name: anim-2;
+}
+
+.item-3{
+	animation-name: anim-3;
+}
+
+@keyframes anim-1 {
+	0%, 8.3% { left: 0%; opacity: 0; }
+  8.3%,25% { left: 15%; opacity: 1; }
+  33.33%, 100% { left: 110%; opacity: 0; }
+}
+
+@keyframes anim-2 {
+	0%, 33.33% { left: 0%; opacity: 0; }
+  41.63%, 58.29% { left: 15%; opacity: 1; }
+  66.66%, 100% { left: 110%; opacity: 0; }
+}
+
+@keyframes anim-3 {
+	0%, 66.66% { left: 0%; opacity: 0; }
+  74.96%, 91.62% { left: 15%; opacity: 1; }
+  100% { left: 110%; opacity: 0; }
+}
