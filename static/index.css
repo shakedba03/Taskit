@@ -36,7 +36,7 @@ body{
 #submit{
     position: absolute;
     top: 75%;
-    right: 10%;
+    right: 5%;
 }
 
 
@@ -73,7 +73,7 @@ body{
   
   font-size: 2em;
 
-	animation-duration: 50s;
+	animation-duration: 30s;
 	animation-timing-function: ease-in-out;
 	animation-iteration-count: infinite;
 }
@@ -92,18 +92,60 @@ body{
 
 @keyframes anim-1 {
 	0%, 8.3% { left: 0%; opacity: 0; }
-  8.3%,25% { left: 15%; opacity: 1; }
+  8.3%,25% { left: 10%; opacity: 1; }
   33.33%, 100% { left: 110%; opacity: 0; }
 }
 
 @keyframes anim-2 {
 	0%, 33.33% { left: 0%; opacity: 0; }
-  41.63%, 58.29% { left: 15%; opacity: 1; }
+  41.63%, 58.29% { left: 5%; opacity: 1; }
   66.66%, 100% { left: 110%; opacity: 0; }
 }
 
 @keyframes anim-3 {
 	0%, 66.66% { left: 0%; opacity: 0; }
-  74.96%, 91.62% { left: 15%; opacity: 1; }
+  74.96%, 91.62% { left: 5%; opacity: 1; }
   100% { left: 110%; opacity: 0; }
+}
+
+
+.btn-hover {
+    width: 200px;
+    font-size: 10%;
+    font-weight:normal;
+    color: #fff;
+    cursor: pointer;
+    margin: 20px;
+    height: 8%;
+    text-align:center;
+    /* font-family: "Brush Script MT", "Brush Script Std", cursive; */
+    font-size: 90%;
+    border: none;
+    background-size: 300% 100%;
+
+    border-radius: 50px;
+    transition: all .4s ease-in-out;
+    -o-transition: all .4s ease-in-out;
+    -webkit-transition: all .4s ease-in-out;
+    transition: all .4s ease-in-out;
+}
+
+.btn-hover:hover {
+    background-position: 100% 0;
+    transition: all .4s ease-in-out;
+    -o-transition: all .4s ease-in-out;
+    -webkit-transition: all .4s ease-in-out;
+    transition: all .4s ease-in-out;
+}
+
+.btn-hover:focus {
+    outline: none;
+}
+
+
+.btn-hover.color-10 {
+    background-image: linear-gradient(to right, rgba(94,0,199,1) 0%, rgba(139,74,247,1) 27%, rgba(127,216,245,1) 58%, rgba(0,198,255,1));
+    box-shadow: 0 4px 15px 0 rgba(127,216,245,1);
+    width: 25%;
+   
 }
