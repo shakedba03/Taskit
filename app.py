@@ -6,7 +6,7 @@ app.secret_key = "MY_SUPER_SECRET_KEY"
 
 @app.route('/')
 def index():
-	return render_template("current_proj.html")
+	return render_template("projects.html")
 	
 @app.route('/signup')
 def signup():
@@ -24,5 +24,10 @@ def new_project():
 			for value in f.getlist(key):
 				print(key,":",value)
 	return render_template("new_project.html")
+
+@app.route('/current_proj')
+def current_proj():
+	return render_template("current_proj.html")
+
 if __name__ == '__main__':
     app.run(debug=True)
