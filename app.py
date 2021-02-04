@@ -23,11 +23,18 @@ def new_project():
 		for key in f.keys():
 			for value in f.getlist(key):
 				print(key,":",value)
+		return render_template("projects.html")
 	return render_template("new_project.html")
 
 @app.route('/current_proj')
 def current_proj():
 	return render_template("current_proj.html")
+
+@app.route('/project_edit', methods=['GET', 'POST'])
+def project_edit():
+	if request.method == "POST":
+		return render_template("projects.html")	
+	return render_template("project_edit.html")
 
 if __name__ == '__main__':
     app.run(debug=True)
