@@ -10,7 +10,7 @@ $(document).ready(function(){
 
     // validate contactForm form
     $(function() {
-        $('#projectEdit').validate({
+        $('#contactForm').validate({
             rules: {
                 name: {
                     required: false,
@@ -58,17 +58,15 @@ $(document).ready(function(){
                 }
             },
             submitHandler: function(form) {
-                
+                // $("#nextBtn1").click(function () {
                 $(form).ajaxSubmit({
                     type:"POST",
                     data: $(form).serialize(),
-                    url:"/project_edit",
+                    url:"/edit_level",
                     success: function() {
-                        // alert("העדכון הושלם.")
-                        $('.alert').alert()
-                        $('#projectEdit :input').attr('disabled', 'disabled');
                         
-                        $('#projectEdit').fadeTo( "slow", 1, function() {
+                        $('#contactForm :input').attr('disabled', 'disabled');
+                        $('#contactForm').fadeTo( "slow", 1, function() {
                             $(this).find(':input').attr('disabled', 'disabled');
                             $(this).find('label').css('cursor','default');
                             $('#success').fadeIn()
@@ -77,10 +75,10 @@ $(document).ready(function(){
                         })
                     },
                     error: function() {
-                        $('#projectEdit').fadeTo( "slow", 1, function() {
-                            $('#error').fadeIn()
-                            $('.modal').modal('hide');
-		                	$('#error').modal('show');
+                        $('#contactForm').fadeTo( "slow", 1, function() {
+                            // $('#error').fadeIn()
+                            // $('.modal').modal('hide');
+		                	// $('#error').modal('show');
                         })
                     }
                 })

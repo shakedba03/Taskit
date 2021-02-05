@@ -33,8 +33,15 @@ def current_proj():
 @app.route('/project_edit', methods=['GET', 'POST'])
 def project_edit():
 	if request.method == "POST":
+		print(request.form["name"])
 		return render_template("projects.html")	
 	return render_template("project_edit.html")
+
+@app.route('/edit_level', methods=['GET', 'POST'])
+def edit_level():
+	if request.method == "POST":
+		return redirect("projects.html")	
+	return render_template("edit_level.html")
 
 if __name__ == '__main__':
     app.run(debug=True)

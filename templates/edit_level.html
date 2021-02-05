@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Edumark</title>
+    <title>TaskIt</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -12,7 +12,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="img/favicon.png">
     <!-- Place favicon.ico in the root directory -->
 
-    <!-- ../static/../static/css here -->
+    <!-- CSS here -->
     <link rel="stylesheet" href="../static/css/bootstrap.min.css">
     <link rel="stylesheet" href="../static/css/owl.carousel.min.css">
     <link rel="stylesheet" href="../static/css/magnific-popup.css">
@@ -24,10 +24,12 @@
     <link rel="stylesheet" href="../static/css/animate.css">
     <link rel="stylesheet" href="../static/css/slicknav.css">
     <link rel="stylesheet" href="../static/css/style.css">
-    <link rel="stylesheet" href="../static/css/responsive.css">
-    <link rel="stylesheet" href="../static/css/current_proj.css">
-    <link rel="stylesheet" href="../static/projects.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../static/new_project.css">
+    <!-- <link rel="stylesheet" href="css/responsive.css"> -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <!------ Include the above in your HEAD tag ---------->
 </head>
 
 <body dir="rtl">
@@ -43,7 +45,7 @@
                     <div class="row align-items-center no-gutters">
                         <div class="col-xl-2 col-lg-2">
                             <div class="logo-img">
-                                <a href="index.html">
+                                <a href="{{url_for('projects')}}">
                                     <h1 style="color:#ffffff;">TASKIT</h1>
                                 </a>
                             </div>
@@ -83,239 +85,76 @@
     </header>
     <!-- header-end -->
 
-    <!-- porject status start -->
-    
-    
-    <!-- porject status end -->
-
     <!-- bradcam_area_start -->
     <div class="bradcam_area breadcam_bg overlay2">
-        <h3>שם פרוייקט</h3>
+        <h3>שם השלב - עריכה</h3>
     </div>
     <!-- bradcam_area_end -->
 
-    
-   
-
-
-    <!-- our_courses_start -->
-    <div class="our_courses">
+    <!-- ================ contact section start ================= -->
+    <section class="contact-section">
         <div class="container">
-            <div class="row">
-                <div class="col-xl-12">
-                    <div class="section_title text-center mb-100">
-                        <h3>מידע כללי</h3>
-                        <br>
+            <div class="d-none d-sm-block mb-5 pb-4">
+                <form class="form-contact contact_form" id="contactForm" novalidate="novalidate" method="POST"
+                    action="/new_project">
+                    <center>
+                        <h1>עריכת פרטי השלב:</h1>
+                    </center>
                     <br>
                     <br>
-                        <div id="proj_info">
-                            <h4>מקצוע:</h4><br>
-                            <h4>תאריך התחלה:</h4><br>
-                            <h4>תאריך הגשה:</h4><br>
-                            <h4>תאריך סיום השלב הקרוב:</h4>
-                            <form method="GET" action="/project_edit">
-                                <button type="submit" class="btn-hover color-10">עריכה</button>
-                            </form>
-                        </div>
-                        <div class="flex-wrapper">
-                            <div class="single-chart">
-                              <svg viewBox="0 0 36 36" class="circular-chart blue">
-                                <path class="circle-bg"
-                                  d="M18 2.0845
-                                    a 15.9155 15.9155 0 0 1 0 31.831
-                                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                                />
-                                <path class="circle"
-                                  stroke-dasharray="90, 100"
-                                  d="M18 2.0845
-                                    a 15.9155 15.9155 0 0 1 0 31.831
-                                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                                />
-                                <text x="18" y="20.35" class="percentage">90%</text>
-                              </svg>
-                            </div>
-                          </div>
-                    </div>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <div class="section_title text-center mb-100">
-                        <h3>שלבים פעילים</h3>
-                        <p>עברו על שלב עם העכבר <br>
-                            כדי לצפות בפרטים נוספים.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xl-3 col-md-6 col-lg-6">
-                    <div class="flip-card">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <div style=" width: 15%;height: 15%;position: relative;top:5%;right: 2%;
-                                border-radius: 50%;
-                                background-color: rgb(26, 168, 8);"></div>           
-                                <h3 style= "display: inline;position:absolute;top:5%;left: 4%">50%</h3>
-                                <h2 style="position:relative;top:10%;">שם הפרויקט</h2>
-                                <h3 style="position:relative;top:13%;">מקצוע: </h3>
-                                <h3 style="position:relative;top:20%;">הגשה: 16.2.2021</h3>
-                            </div>
-                            <div class="flip-card-back">
-                                <h7>תיאור: כאן כתוב התיאור של כל פרוייקט. יש הגבלה על מספר התווים של התיאור.</h7>
-                                <br>
-                                <br>
-                                <h8>שם השלב: 12.12.2020</h8>
-                                <form method="GET" action="/edit_level">
-                                    <button type="submit" class="btn-hover color-10">צפייה</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="col-xl-3 col-md-6 col-lg-6">
-                    <div class="flip-card">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <div style=" width: 15%;height: 15%;position: relative;top:5%;right: 2%;
-                                border-radius: 50%;
-                                background-color: rgb(250, 78, 10);"></div>           
-                                <h3 style= "display: inline;position:absolute;top:5%;left: 4%">50%</h3>
-                                <h2 style="position:relative;top:10%;">שם הפרוייקט</h2>
-                                <h3 style="position:relative;top:13%;">מקצוע: </h3>
-                                <h3 style="position:relative;top:20%;">הגשה: 16.2.2021</h3>
-                            </div>
-                            <div class="flip-card-back">
-                                <h7>תיאור: כאן כתוב התיאור של כל פרוייקט. יש הגבלה על מספר התווים של התיאור.</h7>
-                                <br>
-                                <br>
-                                <h8>שם השלב: 12.12.2020</h8>
-                                <button type="submit" class="btn-hover color-10" id="submit">צפייה בפרוייקט</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <div class="row">
+                        <div class="col-lg-12">
 
-                <div class="col-xl-3 col-md-6 col-lg-6">
-                    <div class="flip-card">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <div style=" width: 15%;height: 15%;position: relative;top:5%;right: 2%;
-                                border-radius: 50%;
-                                background-color: rgb(223, 2, 2);"></div>           
-                                <h3 style= "display: inline;position:absolute;top:5%;left: 4%">50%</h3>
-                                <h2 style="position:relative;top:10%;">שם הפרויקט</h2>
-                                <h3 style="position:relative;top:13%;">מקצוע: </h3>
-                                <h3 style="position:relative;top:20%;">הגשה: 16.2.2021</h3>
-                            </div>
-                            <div class="flip-card-back">
-                                <h7>תיאור: כאן כתוב התיאור של כל פרוייקט. יש הגבלה על מספר התווים של התיאור.</h7>
-                                <br>
-                                <br>
-                                <h8>שם השלב: 12.12.2020</h8> 
-                                <button type="submit" class="btn-hover color-10" id="submit">צפייה בפרוייקט</button>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group" style="width: 45%;">
+                                        <input class="form-control valid" name="name" id="name" type="text"
+                                            onfocus="this.placeholder = ''" onblur="this.placeholder = 'שם הפרוייקט'"
+                                            placeholder="שם הפרוייקט">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <textarea class="form-control w-200" name="message" id="message" cols="5"
+                                            rows="7" onfocus="this.placeholder = ''"
+                                            onblur="this.placeholder = 'במה עוסק הפרוייקט?'"
+                                            placeholder="תיאור הפרוייקט" maxlength="256"></textarea>
+                                    </div>
+                                </div>
+
+
+                                <div style="position: absolute;top: 40%;right: 2%;width: 20%;">
+                                    <div class="form-group">
+                                        <label for="start">תאריך התחלה:</label>
+                                        <input type="date" class="form-control" name="start_date" id="start_date"
+                                            required>
+                                    </div>
+                                </div>
+
+                                <div style="position: absolute;top: 40%;right: 28%;width: 20%;">
+                                    
+                                        <label for="end_date">תאריך הגשה:</label>
+                                        <input type="date" class="form-control" name="end_date" id="end_date" required>
+                                    
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                
+                    <!-- </div> -->
+                    <br>
+                    <br>
+                    <button type="submit" class="btn-hover color-10">סיום</button>      
+                </form>
+
             </div>
         </div>
-    </div>
-    </div>
-    <!-- our_courses_end -->
 
-    <!-- our_courses_start -->
-    <div class="our_courses">
-        <div class="container">
-            <div class="row">
-                <div class="col-xl-12">
-                    <div class="section_title text-center mb-100">
-                        <h3>שלבים שהסתיימו</h3>
-                        <p>עברו על שלב עם העכבר <br>
-                            כדי לצפות בפרטים נוספים.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xl-3 col-md-6 col-lg-6">
-                    <div class="flip-card">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <div style=" width: 15%;height: 15%;position: relative;top:5%;right: 2%;
-                                border-radius: 50%;
-                                background-color: rgb(26, 168, 8);"></div>           
-                                <h3 style= "display: inline;position:absolute;top:5%;left: 4%">50%</h3>
-                                <h2 style="position:relative;top:10%;">שם הפרויקט</h2>
-                                <h3 style="position:relative;top:13%;">מקצוע: </h3>
-                                <h3 style="position:relative;top:20%;">הגשה: 16.2.2021</h3>
-                            </div>
-                            <div class="flip-card-back">
-                                <h7>תיאור: כאן כתוב התיאור של כל פרוייקט. יש הגבלה על מספר התווים של התיאור.</h7>
-                                <br>
-                                <br>
-                                <h8>שם השלב: 12.12.2020</h8>
-                                <button type="submit" class="btn-hover color-10" id="submit">צפייה בפרוייקט</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="col-xl-3 col-md-6 col-lg-6">
-                    <div class="flip-card">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <div style=" width: 15%;height: 15%;position: relative;top:5%;right: 2%;
-                                border-radius: 50%;
-                                background-color: rgb(250, 78, 10);"></div>           
-                                <h3 style= "display: inline;position:absolute;top:5%;left: 4%">50%</h3>
-                                <h2 style="position:relative;top:10%;">שם הפרוייקט</h2>
-                                <h3 style="position:relative;top:13%;">מקצוע: </h3>
-                                <h3 style="position:relative;top:20%;">הגשה: 16.2.2021</h3>
-                            </div>
-                            <div class="flip-card-back">
-                                <h7>תיאור: כאן כתוב התיאור של כל פרוייקט. יש הגבלה על מספר התווים של התיאור.</h7>
-                                <br>
-                                <br>
-                                <h8>שם השלב: 12.12.2020</h8>
-                                <button type="submit" class="btn-hover color-10" id="submit">צפייה בפרוייקט</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="col-xl-3 col-md-6 col-lg-6">
-                    <div class="flip-card">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <div style=" width: 15%;height: 15%;position: relative;top:5%;right: 2%;
-                                border-radius: 50%;
-                                background-color: rgb(223, 2, 2);"></div>           
-                                <h3 style= "display: inline;position:absolute;top:5%;left: 4%">50%</h3>
-                                <h2 style="position:relative;top:10%;">שם הפרויקט</h2>
-                                <h3 style="position:relative;top:13%;">מקצוע: </h3>
-                                <h3 style="position:relative;top:20%;">הגשה: 16.2.2021</h3>
-                            </div>
-                            <div class="flip-card-back">
-                                <h7>תיאור: כאן כתוב התיאור של כל פרוייקט. יש הגבלה על מספר התווים של התיאור.</h7>
-                                <br>
-                                <br>
-                                <h8>שם השלב: 12.12.2020</h8> 
-                                <button type="submit" class="btn-hover color-10" id="submit">צפייה בפרוייקט</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-    </div>
-    </div>
-    <!-- our_courses_end -->
-
+    </section>
+    <!-- ================ contact section end ================= -->
 
     <!-- footer -->
     <footer class="footer footer_bg_1">
@@ -326,7 +165,7 @@
                         <div class="footer_widget">
                             <div class="footer_logo">
                                 <a href="#">
-                                    <h1>TASKIT</h1>
+                                    <img src="img/logo.png" alt="">
                                 </a>
                             </div>
                             <p>
@@ -424,7 +263,7 @@
         </div>
     </footer>
     <!-- footer -->
-
+    <!-- link that opens popup -->
 
     <!-- form itself end-->
     <form id="test-form" class="white-popup-block mfp-hide">
@@ -487,7 +326,6 @@
     </form>
     <!-- form itself end -->
 
-
     <!-- JS here -->
     <script src="../static/js/vendor/modernizr-3.5.0.min.js"></script>
     <script src="../static/js/vendor/jquery-1.12.4.min.js"></script>
@@ -509,14 +347,14 @@
     <script src="../static/js/gijgo.min.js"></script>
 
     <!--contact js-->
-    <script src="../static/js/contact.js"></script>
+    <script src="../static/js/project_edit.js"></script>
+    <script src="../static/js/new_project.js"></script>
     <script src="../static/js/jquery.ajaxchimp.min.js"></script>
     <script src="../static/js/jquery.form.js"></script>
     <script src="../static/js/jquery.validate.min.js"></script>
     <script src="../static/js/mail-script.js"></script>
 
     <script src="../static/js/main.js"></script>
-
 </body>
 
 </html>
