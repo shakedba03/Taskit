@@ -140,4 +140,9 @@ background: linear-gradient(63deg, rgba(94,0,199,1) 0%, rgba(139,74,247,1) 57%, 
   74.96%, 91.62% { left: 35%; opacity: 1; }
   100% { left: 110%; opacity: 0; }
 }
+#title2{
+    position: absolute;
+    top: 70%;
+    right: 15%;
+}
 

@@ -15,7 +15,7 @@
     <div id="login_div">
         <img src="../static/logo2.JPG" style="position: absolute; top: -5%; right: 0%;">
         <h1 id="title">כניסה לחשבון</h1>
-        <form>
+        <form action="/" method="POST">
             <input type="text" placeholder="שם משתמש" name="username" id="username">
             <input type="password" placeholder="סיסמה" name ="password" id="password">
             <a href="{{url_for('signup')}}" id="signup">עוד לא נרשמתם? הירשמו כאן!</a>

@@ -15,7 +15,9 @@
     <div id="signup_div">
         
         <h1 id="title">הרשמה</h1>
-        <form>
+        <h3 id="title2">{{msg}}</h3>
+        <form action="/signup" method="POST">
+            
             <input type="text" placeholder="שם משתמש" name="username" id="username" required="required">
             <input type="password" placeholder="סיסמה" name ="password" id="password" required="required"> 
             <input type="password" placeholder="אימות סיסמה" name ="password2" id="password2" required="required">

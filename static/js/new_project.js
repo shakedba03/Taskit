@@ -1,96 +1,58 @@
-// var currentTab = 0; // Current tab is set to be the first tab (0)
-// showTab(currentTab); // Display the current tab
-
-// function showTab(n) {
-//   // This function will display the specified tab of the form...
-//   var x = document.getElementsByClassName("tab");
-//   x[n].style.display = "block";
-//   //... and fix the Previous/Next buttons:
-//   if (n == 0) {
-//     document.getElementById("prevBtn").style.display = "none";
-//   } else {
-//     document.getElementById("prevBtn").style.display = "inline";
-//   }
-//   if (n == (x.length - 1)) {
-//     document.getElementById("nextBtn1").innerHTML = "Submit";
-//   } else {
-//     document.getElementById("nextBtn1").innerHTML = "הבא";
-//   }
-//   //... and run a function that will display the correct step indicator:
-//   fixStepIndicator(n)
-// }
-
-// function nextPrev(n) {
-//   // This function will figure out which tab to display
-//   var x = document.getElementsByClassName("tab");
-//   // Exit the function if any field in the current tab is invalid:
-//   // if (n == 1 && !validateForm()) return false;
-//   // Hide the current tab:
-//   x[currentTab].style.display = "none";
-//   // Increase or decrease the current tab by 1:
-//   currentTab = currentTab + n;
-//   // if you have reached the end of the form...
-//   if (currentTab >= x.length) {
-//     // ... the form gets submitted:
-//     // document.getElementById("contactForm").submit();
-//     document.getElementById("nextBtn1").type = "submit";
-//     alert( document.getElementById("nextBtn1").type)
-//     return false;
-//   }
-//   // Otherwise, display the correct tab:
-//   showTab(currentTab);
-// }
-
-// function validateForm() {
-// //   // This function deals with validation of the form fields
-// //   var x, y, i, valid = true;
-// //   x = document.getElementsByClassName("tab");
-// //   y = x[currentTab].getElementsByTagName("input");
-// //   // A loop that checks every input field in the current tab:
-// //   for (i = 0; i < y.length; i++) {
-// //     // If a field is empty...
-// //     if (y[i].value == "") {
-// //       // add an "invalid" class to the field:
-// //       y[i].className += " invalid";
-// //       // and set the current valid status to false
-// //       valid = false;
-// //     }
-// //   }
-//   // If the valid status is true, mark the step as finished and valid:
-  
-//   document.getElementsByClassName("step")[currentTab].className += " finish";
-
-//   return 1 // return the valid status
-// }
-
-// function fixStepIndicator(n) {
-//   // This function removes the "active" class of all steps...
-//   var i, x = document.getElementsByClassName("step");
-//   for (i = 0; i < x.length; i++) {
-//     x[i].className = x[i].className.replace(" active", "");
-//   }
-//   //... and adds the "active" class on the current step:
-//   x[n].className += " active";
-// }
-
-
 $(document).ready(function () {
   var counter = 2;
+
+  function minDateOfStart() {
+    var lastEndDate = document.getElementsByName("level_end" + (counter - 1))[0].value;
+    return lastEndDate
+  }
+
+
+  function getMax() {
+    var projectEnd = document.getElementsByName("end_date")[0].value;
+    return projectEnd;
+  }
+
+  function checkDates(){
+    var start =  document.getElementsByName("level_start" + (counter - 1))[0].value;
+    var end =  document.getElementsByName("level_end" + (counter - 1))[0].value;
+    startD = new Date(start);
+    endD = new Date(end);
+    if (startD > endD){
+      alert("תאריך ההתחלה של השלב חייב להיות מוקדם מתאריך הסיום.")
+      return false;
+    }
+    return true;
+  }
+
+  function disableLast() {
+    var levelStart = document.getElementsByName("level_start" + (counter - 1))[0];
+    var levelEnd = document.getElementsByName("level_end" + (counter - 1))[0];
+    levelStart.disabled = true;
+    levelEnd.disabled = true;
+  }
+
 
   $("#addrow").on("click", function () {
     var newRow = $("<tr>");
     var cols = "";
-    if (counter < 15) {
-      cols += '<td><input type="text" class="form-control" name="level_name' + counter + '"/></td>';
-      cols += '<td><input type="date" class="form-control" name="level_start' + counter + '"/></td>';
-      cols += '<td><input type="date" class="form-control" name="level_end' + counter + '"/></td>';
-      cols += '<td><input type="text" class="form-control" name="level_descrip' + counter + '"/></td>';
-      cols += '<td><input type="button" class="ibtnDel btn btn-md btn-danger "  value="מחק"></td>';
+    var dateInput1 = document.getElementsByName("level_start" + (counter - 1))[0].value;
+    var dateInput2 = document.getElementsByName("level_end" + (counter - 1))[0].value;
+ 
+    if (counter < 15 && dateInput1.length != 0 && dateInput2 != 0 && checkDates()) {
+      disableLast();
+      cols += '<td><input required type="text" class="form-control" name="level_name' + counter + '"/></td>';
+      cols += '<td><input type="date"' + 'min ="' + minDateOfStart() + '"max ="' + getMax() +
+       '" required class="form-control" name="level_start' + counter + '"/></td>';
+      cols += '<td><input type="date"' + 'min ="' + minDateOfStart() + '"max ="' + getMax() +
+      '"required class="form-control" name="level_end' + counter + '"/></td>';
+      cols += '<td><input required type="text" class="form-control" name="level_descrip' + counter + '"/></td>';
+      cols += '<td><input required type="button" class="ibtnDel btn btn-md btn-danger "  value="מחק"></td>';
+
       newRow.append(cols);
       $("table.order-list").append(newRow);
       counter++;
     }
-    if(counter == 15){
+    if (counter == 15) {
       document.getElementById("addrow").value = "לא ניתן להוסיף עוד שלבים.";
     }
 
@@ -120,3 +82,4 @@ function calculateGrandTotal() {
   });
   $("#grandtotal").text(grandTotal.toFixed(2));
 }
+
