@@ -57,21 +57,55 @@ def new_project():
 	global current_user
 	today = datetime.today().strftime('%Y-%m-%d')
 	if request.method == 'POST':
+		#adding a new project to the projects table.
 		p_name = request.form['name']
 		subject = request.form['subject']
-		p_start_date = request.form['start_date']
-		p_end_date = request.form['end_date']
+		p_start_date = request.form['start_val']
+		p_end_date = request.form['end_val']
 		p_duration = duration_calc(p_start_date, p_end_date)
 		p_descrip = request.form['message']
 		owner = current_user.username
-		add_project(p_name, subject, p_start_date, p_end_date, p_duration, p_descrip, owner)
+
+		add_project(p_name, subject, p_start_date,
+					p_end_date, p_duration, p_descrip, owner)
 		print("ADDED")
-		# new_project_data = request.form
+		print("***NEW PROJECT INFO:")
+		print("Name: " + p_name + '\n' +
+		"Subject: " + subject + '\n' +
+		"Start Date: " + p_start_date + '\n' +
+		"End Date: " + p_end_date + '\n' +
+		"Duration: " + str(p_duration) + '\n' +
+		"Description: " + p_descrip + '\n' +
+		"Owner: " + owner)
+		# adding the project's levels to the levels project.
+		for i in range(1, 16):
+			try:
+				level_name = request.form["level_name" + str(i)]
+				level_start = request.form["level_start" + str(i)]
+				level_end = request.form["level_end" + str(i)]
+				level_descrip = request.form["level_descrip" + str(i)]
+				level_num = i
+				from_p = p_name
+				level_duration = duration_calc(level_start, level_end)
+				percent = (level_duration / p_duration) * 100
+				add_level(level_name, level_num, level_start,
+				level_end, level_duration, percent, level_descrip, from_p, owner)
+				print("ADDED LEVEL")
+				print("Name: " + level_name + '\n' +
+				"Num: " + str(level_num) + '\n' +
+				"Start Date: " + level_start + '\n' +
+				"End Date: " + level_end + '\n' +
+				"Duration: " + str(level_duration) + '\n' +
+				"Description: " + level_descrip + '\n' +
+				"Owner: " + owner)
+			except:
+				print("PASS...")
+		# f = request.form
 		# for key in f.keys():
 		# 	for value in f.getlist(key):
 		# 		print(key,":",value)
-
-		return render_template("projects.html", today = today)
+		
+		return render_template("projects.html")
 	return render_template("new_project.html", today = today)
 
 @app.route('/current_proj')

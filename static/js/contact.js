@@ -46,16 +46,6 @@ $(document).ready(function(){
                     required: true,
                     minlength: 20
                 },
-                // start_date2: {
-                //     required: true,
-                //     date: true,
-                // },
-                // end_date2: {
-                //     required: true,
-                //     date: true,
-                //     date: TimeRanges,
-                // },
-                
             },
             messages: {
                 name: {
@@ -97,6 +87,8 @@ $(document).ready(function(){
                             $('#success').fadeIn()
                             $('.modal').modal('hide');
 		                	$('#success').modal('show');
+                            alert("הפרוייקט נוסף למערכת. ניתן לצפות בו במסך הפרוייקטים.");
+                            window.location.href ='/projects';
                         })
                     },
                     error: function() {
@@ -107,7 +99,7 @@ $(document).ready(function(){
                         })
                     }
                 })
-            } //********************* */
+            } 
             
         })
     })

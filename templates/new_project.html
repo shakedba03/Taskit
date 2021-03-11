@@ -29,55 +29,8 @@
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="../static/js/new_proj_DOM.js"></script>
     <!------ Include the above in your HEAD tag ---------->
-    <script>
-        function setMin() {
-            var projectStart = document.getElementsByName("start_date")[0];
-            var firstLevelStart = document.getElementsByName("level_start1")[0];
-            var firstLevelEnd = document.getElementsByName("level_end1")[0];
-            firstLevelStart.setAttribute("min", projectStart.value);
-            if(projectStart.value != ""){
-                projectStart.disabled = true;
-            }
-        }
-
-        function setMax() {
-            var projectEnd = document.getElementsByName("end_date")[0];
-            var firstLevelStart = document.getElementsByName("level_start1")[0];
-            var firstLevelEnd = document.getElementsByName("level_end1")[0];
-            firstLevelStart.setAttribute("max", projectEnd.value);
-            firstLevelEnd.setAttribute("max", projectEnd.value); 
-            if(projectEnd.value != ""){  
-                projectEnd.disabled = true;
-                firstLevelStart.disabled = false;
-                firstLevelEnd.disabled = false;
-            }
-        }
-
-        function setMinEnd() {
-            var levelStart = document.getElementsByName("level_start1")[0];
-            var levelEnd = document.getElementsByName("level_end1")[0];
-            levelEnd.setAttribute("min", levelStart.value);
-            if (levelStart.value != ""){
-                levelStart.disabled = true;
-            }
-        }
-
-        function disableEnd(){
-            var levelEnd = document.getElementsByName("level_end1")[0];
-            levelEnd.disabled = true;
-        }
-
-        function clear(){
-            var levelStart = document.getElementsByName("level_start1")[0];
-            var levelEnd = document.getElementsByName("level_end1")[0];
-            // levelStart.value = "";
-            // levelEnd.value = "";
-            alert("skljdlk");
-            levelStart.disabled = false;
-            levelEnd.disabled = false;
-        }
-    </script>
 </head>
 
 <body dir="rtl">
@@ -187,6 +140,7 @@
                                         <label for="start">תאריך התחלה:</label>
                                         <input type="date" class="form-control" name="start_date" id="start_date"
                                             min={{today}} required onblur="setMin()">
+                                        <input type="hidden" id="start_val" name="start_val" value="none">
                                     </div>
                                 </div>
 
@@ -195,7 +149,7 @@
                                     <label for="end_date">תאריך הגשה:</label>
                                     <input type="date" class="form-control" name="end_date" id="end_date"
                                      required onblur="setMax()">
-
+                                     <input type="hidden" id="end_val" name="end_val" value="none">
                                 </div>
                             </div>
                         </div>
@@ -227,18 +181,18 @@
                                         <input type="text" required name="level_name1" class="form-control" />
                                     </td>
                                     <td class="col-sm-2">
-                                        <input type="date" disabled required name="level_start1" class="form-control"
+                                        <input type="date" readonly required name="level_start1" class="form-control"
                                         onblur="setMinEnd()" />
                                     </td>
                                     <td class="col-sm-2">
-                                        <input type="date" disabled required name="level_end1" id="level_end1"
+                                        <input type="date" readonly required name="level_end1" id="level_end1"
                                             class="form-control" onblur="disableEnd()"/>
                                     </td>
                                     <td class="col-sm-5">
                                         <input type="text" required name="level_descrip1" class="form-control" />
                                     </td>
                                     
-                                    <td><input type="button" onclick="clear()" class=" btn btn-md btn-success "  value="ניקוי"></td>
+                                    <td><input type="button" onclick="clearFields()" class=" btn btn-md btn-success " value="ניקוי"></td>
                                     
                                 </tr>
                             </tbody>

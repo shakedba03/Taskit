@@ -1,4 +1,4 @@
-from model import Base, Users, Projects
+from model import Base, Users, Projects, Levels
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -61,4 +61,31 @@ def return_project(owner):
     session = DBSession()
     project = session.query(Projects).filter_by(owner = owner).first()
     return project
+#############################################################################################################
+def add_level(name, level_num, start_date, end_date, duration, percent, description, from_project, owner):
+    session = DBSession()
+    level_object = Levels(
+    name = name,
+    level_num = level_num,
+    start_date = start_date,
+    end_date = end_date,
+    duration = duration, 
+    percent = percent,
+    description = description,
+    from_project = from_project,
+    owner = owner,
+    is_done = False)
+    session.add(level_object)
+    session.commit()
 
+
+def return_project_levels(owner, project_name):
+    session = DBSession()
+    levels = session.query(Projects).filter_by(owner = owner, project_name = project_name).all()
+    return levels
+
+
+def return_level(owner, project_name):
+    session = DBSession()
+    level = session.query(Projects).filter_by(owner = owner, project_name = project_name).first()
+    return level

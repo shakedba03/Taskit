@@ -29,14 +29,14 @@ class Projects(Base):
 class Levels(Base):
     __tablename__ = 'levels'
     id = Column(Integer, primary_key = True)
-    name = Column(String)
-    level_num = Column(Integer)
-    start_date = Column(String)
-    end_date = Column(String)
-    duration = Column(Integer)
-    percent = Column(Integer)
-    description = Column(String)
-    from_project = Column(String)
-    owner = Column(String)
-    is_done = Column(Boolean)
+    name = Column(String) #
+    level_num = Column(Integer) #
+    start_date = Column(String) #
+    end_date = Column(String) #
+    duration = Column(Integer) #
+    percent = Column(Integer) #
+    description = Column(String) #
+    from_project = Column(String) #
+    owner = Column(String) #
+    is_done = Column(Boolean) #
     
