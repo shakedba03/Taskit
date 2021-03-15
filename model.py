@@ -17,13 +17,16 @@ class Users(Base):
 class Projects(Base):
     __tablename__ = 'projects'
     id = Column(Integer, primary_key = True)
-    name = Column(String)
-    subject = Column(String)
-    start_date = Column(String)
-    end_date = Column(String)
-    duration = Column(Integer)
-    description = Column(String)
-    owner = Column(String)
+    name = Column(String) #
+    subject = Column(String) #
+    start_date = Column(String) #
+    end_date = Column(String) #
+    duration = Column(Integer) #
+    description = Column(String) #
+    owner = Column(String) #
+    is_active = Column(Boolean) #
+    color = Column(String) #
+    percents_ready = Column(Integer)#
 
 
 class Levels(Base):
@@ -39,4 +42,5 @@ class Levels(Base):
     from_project = Column(String) #
     owner = Column(String) #
     is_done = Column(Boolean) #
+    color = Column(String) #
     
