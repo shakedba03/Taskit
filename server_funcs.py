@@ -1,6 +1,7 @@
 import datetime as dt
 from datetime import datetime
 from databases import return_project_levels, update_level_percents
+import sys
 
 def format_date(date):
     # Gets a str of a date.
@@ -20,18 +21,15 @@ def duration_calc(s_date, e_date):
     return duration.days
 
 
-def user_projects_levels_full(username, projects_list):
-    # Gets a username and projects list, returns a dictionary that connects the project to its levels.
-    print(projects_list)
-    data_dict = {}
+def verify_user_projects(username, projects_list):
+    # Gets a username and projects list, checks the percentage calc, returns a project list.
 
     for project in projects_list:
         levels_objects_list = return_project_levels(username, project.name)
         fix_sum_percents(levels_objects_list, project.start_date, project.end_date, project.duration, project.name, username)
         project.percents_ready = percents_ready(levels_objects_list)
-        data_dict[project] = levels_objects_list
     
-    return data_dict
+    return projects_list
 
 
 def get_color(end_date):
@@ -76,5 +74,24 @@ def fix_sum_percents(levels_list, p_start, p_end, p_duration, from_project, user
         if last_level_end != p_end:
             duration_end = levels_list[len(levels_list) - 1].duration + duration_calc(project_end, last_level_end)
             # update the level's percent in the DB
-            update_level_percents(username, from_project, levels_list[len(levels_list) - 1].level_num, p_duration, duration_end)
+            update_level_percents(username, from_project, levels_list[len(levels_list) - 1].level_num, 
+            p_duration, duration_end)
+
+def return_closest_due(levels_list):
+    # Gets a list of all levels, returns the closest due level.
+    today = datetime.today()
+    closest_due = None
+    min_gap = sys.maxsize
+    for level in levels_list:
+        current_date = format_date(level.end_date)
+        current_gap = duration_calc(today.date(), current_date)
+
+        if current_date > today.date() and level.is_done == False and min_gap > current_gap and current_gap >= 0:
+            closest_due = level
+            min_gap = current_gap
+
+        if current_date < today.date() and level.is_done == False:
+            closest_due = level
+            break
+    return closest_due
         

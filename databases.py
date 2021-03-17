@@ -68,9 +68,9 @@ def return_user_projects(owner):
     return projects
 
 
-def return_project(owner):
+def return_project(owner, name):
     session = DBSession()
-    project = session.query(Projects).filter_by(owner = owner).first()
+    project = session.query(Projects).filter_by(owner = owner, name = name).first()
     return project
 #############################################################################################################
 def add_level(name, level_num, start_date, end_date, duration, percent, description, from_project, owner, color):
@@ -107,3 +107,6 @@ def update_level_percents(owner, from_project, level_num, project_duration, new_
     level_object.percent = (new_duration / project_duration) * 100
     print("UPDATED PERCENTS%")
     session.commit()
+
+
+

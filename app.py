@@ -50,10 +50,15 @@ def signup():
 			return render_template("index.html")
 	return render_template("signup.html", msg = msg)
 
-@app.route('/projects')
+@app.route('/projects', methods=['GET', 'POST'])
 def projects():
 	global current_user
-	all_levels_projects_dict = {}
+	if request.method == 'POST':
+		# Get the project out of the DB
+		clicked_proj = request.form['project_name']
+		# Redirect to '/current_proj'
+		return redirect(url_for('current_proj', project_name = clicked_proj))
+	
 	# Pull from the project table all projects related to the user.
 	# Put it in a list.
 	# Get the date of the closest due date.
@@ -61,9 +66,13 @@ def projects():
 	user_projects = return_user_projects(current_user.username)
 	# print("at all projects: TOTAL PROJECTS NUM is " + str(current_user.total_porject_num)) ---> DELETE IT
 	if current_user.total_porject_num != 0:
-		all_levels_projects_dict = user_projects_levels_full(current_user.username, user_projects)
-		print(all_levels_projects_dict)
-	return render_template("projects.html", all_levels_projects_dict = all_levels_projects_dict)
+		user_projects = verify_user_projects(current_user.username, user_projects)
+		projects_due_dict = {}
+		for project in user_projects:
+			levels = return_project_levels(current_user.username, project.name)
+			projects_due_dict[project] = return_closest_due(levels)
+		
+	return render_template("projects.html", user_projects = projects_due_dict)
 
 @app.route('/new_project', methods=['GET', 'POST'])
 def new_project():
@@ -81,19 +90,9 @@ def new_project():
 		color = get_color(p_end_date)
 		percents_ready = 0
 		# Adding a new project to the projects table.
-		
 		add_project(p_name, subject, p_start_date,
 					p_end_date, p_duration, p_descrip, owner, color, percents_ready)
-		# Print results. ---> DELETE IT
-		# print("ADDED")
-		# print("***NEW PROJECT INFO:")
-		# print("Name: " + p_name + '\n' +
-		# "Subject: " + subject + '\n' +
-		# "Start Date: " + p_start_date + '\n' +
-		# "End Date: " + p_end_date + '\n' +
-		# "Duration: " + str(p_duration) + '\n' +
-		# "Description: " + p_descrip + '\n' +
-		# "Owner: " + owner)
+
 		for i in range(1, 16):
 			try:
 				# Getting the form data - levels.
@@ -109,17 +108,7 @@ def new_project():
 				# Adding the project's levels to the levels table.
 				add_level(level_name, level_num, level_start,
 				level_end, level_duration, percent, level_descrip, from_p, owner, level_color)
-				# Print results. ---> DELETE IT
-				# print("ADDED LEVEL")
-				# print("Name: " + level_name + '\n' +
-				# "Num: " + str(level_num) + '\n' +
-				# "Start Date: " + level_start + '\n' +
-				# "End Date: " + level_end + '\n' +
-				# "Duration: " + str(level_duration) + '\n' +
-				# "Description: " + level_descrip + '\n' +
-				# "Owner: " + owner)
 			except:
-				# print("PASS...") ---> DELETE IT
 				pass
 		
 		update_active_proj_num(current_user.username)
@@ -127,9 +116,14 @@ def new_project():
 		return render_template("projects.html")
 	return render_template("new_project.html", today = today)
 
-@app.route('/current_proj')
-def current_proj():
-	return render_template("current_proj.html")
+@app.route('/current_proj/<project_name>')
+def current_proj(project_name):
+	global current_user
+	project_object = return_project(current_user.username, project_name)
+	project_levels = return_project_levels(current_user.username, project_object.name)
+	due_level = return_closest_due(project_levels)
+	return render_template("current_proj.html", project_object = project_object, due_date = due_level.end_date,
+	levels_list = project_levels)
 
 @app.route('/project_edit', methods=['GET', 'POST'])
 def project_edit():

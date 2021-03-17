@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Edumark</title>
+    <title>{{ project_object.name }}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -90,7 +90,7 @@
 
     <!-- bradcam_area_start -->
     <div class="bradcam_area breadcam_bg overlay2">
-        <h3>שם פרוייקט</h3>
+        <h3>{{ project_object.name }}</h3>
     </div>
     <!-- bradcam_area_end -->
 
@@ -109,10 +109,10 @@
                     <br>
                     <br>
                         <div id="proj_info">
-                            <h4>מקצוע:</h4><br>
-                            <h4>תאריך התחלה:</h4><br>
-                            <h4>תאריך הגשה:</h4><br>
-                            <h4>תאריך סיום השלב הקרוב:</h4>
+                            <h4>מקצוע: {{ project_object.subject}}</h4><br>
+                            <h4>תאריך התחלה: {{ project_object.start_date }}</h4><br>
+                            <h4>תאריך הגשה: {{ project_object.end_date }}</h4><br>
+                            <h4>תאריך סיום השלב הקרוב: {{ due_date }}</h4>
                             <form method="GET" action="/project_edit">
                                 <button type="submit" class="btn-hover color-10">עריכה</button>
                             </form>
@@ -126,12 +126,12 @@
                                     a 15.9155 15.9155 0 0 1 0 -31.831"
                                 />
                                 <path class="circle"
-                                  stroke-dasharray="90, 100"
+                                  stroke-dasharray='{{ project_object.percents_ready|string + ", 100" }}'
                                   d="M18 2.0845
                                     a 15.9155 15.9155 0 0 1 0 31.831
                                     a 15.9155 15.9155 0 0 1 0 -31.831"
                                 />
-                                <text x="18" y="20.35" class="percentage">90%</text>
+                                <text x="18" y="20.35" class="percentage">{{ project_object.percents_ready }}</text>
                               </svg>
                             </div>
                           </div>
@@ -143,39 +143,50 @@
                     <br>
                     <div class="section_title text-center mb-100">
                         <h3>שלבים פעילים</h3>
-                        <p>עברו על שלב עם העכבר <br>
+                        <p>עברו על שלב עם העכבר 
                             כדי לצפות בפרטים נוספים.
+                            אם ברצונכם לעדכן סטטוס של שלב, לחצו עריכה בשלב המבוקש.
                         </p>
                     </div>
                 </div>
             </div>
             <div class="row">
+                {% for level in levels_list %}
                 <div class="col-xl-3 col-md-6 col-lg-6">
                     <div class="flip-card">
                         <div class="flip-card-inner">
                             <div class="flip-card-front">
-                                <div style=" width: 15%;height: 15%;position: relative;top:5%;right: 2%;
-                                border-radius: 50%;
-                                background-color: rgb(26, 168, 8);"></div>           
-                                <h3 style= "display: inline;position:absolute;top:5%;left: 4%">50%</h3>
-                                <h2 style="position:relative;top:10%;">שם הפרויקט</h2>
-                                <h3 style="position:relative;top:13%;">מקצוע: </h3>
-                                <h3 style="position:relative;top:20%;">הגשה: 16.2.2021</h3>
+                                <div id="dotColor">
+                                    <style>
+                                        #dotColor{
+                                            width: 15%;
+                                            height: 15%;
+                                            position:relative;
+                                            top:5%;
+                                            right: 2%;
+                                            border-radius: 50%;
+                                            background-color: {{ level.color}};
+                                        }
+                                   </style>
+                                </div>           
+                                <h2 style="position:relative;top:10%;">{{level.name }}</h2>
+                                <h4 style="position:relative;top:20%;"> הגשה: {{ level.end_date }}</h4>
                             </div>
                             <div class="flip-card-back">
-                                <h7>תיאור: כאן כתוב התיאור של כל פרוייקט. יש הגבלה על מספר התווים של התיאור.</h7>
+                                <h7>{{ level.description}}</h7>
                                 <br>
                                 <br>
-                                <h8>שם השלב: 12.12.2020</h8>
-                                <form method="GET" action="/edit_level">
-                                    <button type="submit" class="btn-hover color-10">צפייה</button>
+                                <form method="POST" action="/edit_level">
+                                    <input type="hidden" name="level_name" 
+                                    value = '{{ level.name }}' >
+                                    <button type="submit" class="btn-hover color-10">עריכה</button>
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-xl-3 col-md-6 col-lg-6">
+                {% endfor %}
+                <!-- <div class="col-xl-3 col-md-6 col-lg-6">
                     <div class="flip-card">
                         <div class="flip-card-inner">
                             <div class="flip-card-front">
@@ -220,11 +231,11 @@
                         </div>
                     </div>
                 </div>
-                
+                 -->
             </div>
         </div>
     </div>
-    </div>
+ 
     <!-- our_courses_end -->
 
     <!-- our_courses_start -->

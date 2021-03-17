@@ -106,7 +106,7 @@
                 </div>
             </div>
             <div class="row">
-                {% for key in all_levels_projects_dict %}
+                {% for key in user_projects %}
                 <div class="col-xl-3 col-md-6 col-lg-6">
                     <div class="flip-card">
                         <div class="flip-card-inner">
@@ -133,11 +133,12 @@
                                 <h7>{{ key.description}}</h7>
                                 <br>
                                 <br>
-                                <h8>שם השלב: 12.12.2020</h8>
-                                <form method="GET" action="/current_proj">
+                                <h8>{{ user_projects[key].end_date }} : {{ user_projects[key].name }}</h8>
+                                <form method="POST" action="/projects">
+                                    <input type="hidden" name="project_name" 
+                                    value = '{{ key.name }}' >
                                     <button type="submit" class="btn-hover color-10">צפייה</button>
                                 </form>
-                                
                             </div>
                         </div>
                     </div>
