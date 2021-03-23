@@ -3,21 +3,25 @@ from model import *
 from databases import *
 from server_funcs import *
 from datetime import datetime
+from OpenSSL import SSL
 
 app = Flask(__name__)
 app.secret_key = "MY_SUPER_SECRET_KEY"
 
 current_user = None
-
+default_subjects = ["אנגלית", "מתמטיקה", "מדעי המחשב", "מדעי החברה", "סייבר", "ביולוגיה", "פיזיקה", "אומנות"]
+project_name = ""
+level_name = ""
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-	global current_user, user_projects
+	global current_user, user_projects, default_subjects
+	#add_subjects(default_subjects)
 	if request.method == 'POST':
 		username = request.form['username']
 		password = request.form['password']
 		users_list = return_all_users()
-
+		
 		for user in users_list:
 			if user.username == username and user.password == password:
 				# get the user's porjects and levels from the db.
@@ -58,20 +62,20 @@ def projects():
 		clicked_proj = request.form['project_name']
 		# Redirect to '/current_proj'
 		return redirect(url_for('current_proj', project_name = clicked_proj))
-	
+
 	# Pull from the project table all projects related to the user.
 	# Put it in a list.
 	# Get the date of the closest due date.
 	current_user = return_user(current_user.username)
 	user_projects = return_user_projects(current_user.username)
+	projects_due_dict = {}
 	# print("at all projects: TOTAL PROJECTS NUM is " + str(current_user.total_porject_num)) ---> DELETE IT
 	if current_user.total_porject_num != 0:
 		user_projects = verify_user_projects(current_user.username, user_projects)
-		projects_due_dict = {}
 		for project in user_projects:
 			levels = return_project_levels(current_user.username, project.name)
 			projects_due_dict[project] = return_closest_due(levels)
-		
+			
 	return render_template("projects.html", user_projects = projects_due_dict)
 
 @app.route('/new_project', methods=['GET', 'POST'])
@@ -84,7 +88,7 @@ def new_project():
 		subject = request.form['subject']
 		p_start_date = request.form['start_val']
 		p_end_date = request.form['end_val']
-		p_duration = duration_calc(p_start_date, p_end_date)
+		p_duration = duration_calc(p_start_date, p_end_date) ##################
 		p_descrip = request.form['message']
 		owner = current_user.username
 		color = get_color(p_end_date)
@@ -116,7 +120,7 @@ def new_project():
 		return render_template("projects.html")
 	return render_template("new_project.html", today = today)
 
-@app.route('/current_proj/<project_name>')
+@app.route('/current_proj/<project_name>', methods=['GET', 'POST'])
 def current_proj(project_name):
 	global current_user
 	project_object = return_project(current_user.username, project_name)
@@ -125,18 +129,80 @@ def current_proj(project_name):
 	return render_template("current_proj.html", project_object = project_object, due_date = due_level.end_date,
 	levels_list = project_levels)
 
+
+@app.route('/temp_edit', methods=['POST'])
+def temp_edit():
+	global project_name
+	# Get the project name
+	project_name = request.form['project_name']
+	# Redirect to '/project_edit'
+	return redirect('project_edit')
+	
+
 @app.route('/project_edit', methods=['GET', 'POST'])
 def project_edit():
-	if request.method == "POST":
-		print(request.form["name"])
-		return render_template("projects.html")	
-	return render_template("project_edit.html")
+	global current_user, project_name
+	today = datetime.today().strftime('%Y-%m-%d')
+	all_levels = return_project_levels(current_user.username, project_name)
+	levels_str = make_str_levels(all_levels)
+	project_object = return_project(current_user.username, project_name)
+	if request.method == 'POST':
+		name = request.form["name"]
+		start_date = request.form["start_date"]
+		end_date = request.form["end_date"]
+		subject = request.form["subject"]
+		descrip = request.form["message"]
 
-@app.route('/edit_level', methods=['GET', 'POST'])
-def edit_level():
+		update_from_proj(current_user.username, project_name, name)
+		edit_project(current_user.username, project_name, name, start_date, end_date, subject, descrip)
+		return redirect('/projects')
+		
+	return render_template("project_edit.html", project = project_object, today = today,
+	levels_str = levels_str)
+
+@app.route('/temp_edit_level', methods=['POST'])
+def temp_edit_level():
+	global level_name, project_name
+	# Get the level name
+	level_name = request.form['level_name']
+	project_name = request.form['p_name']
+	# Redirect to '/project_edit'
+	return redirect('/level_edit')
+		
+@app.route('/level_edit', methods=['GET', 'POST'])
+def level_edit():
+	global current_user, level_name, project_name
+	today = datetime.today().strftime('%Y-%m-%d')
+	project = return_project(current_user.username, project_name)
+	project_str = make_str_project(project)
 	if request.method == "POST":
-		return redirect("projects.html")	
-	return render_template("edit_level.html")
+		print(level_name)
+		name = request.form["name"]
+		start_date = request.form["start_date"]
+		end_date = request.form["end_date"]
+		descrip = request.form["message"]
+		status = request.form["status"]
+		is_done = False
+		if status == "done":
+			is_done = True
+		if start_date or end_date:
+			new_duration = duration_calc(start_date, end_date)
+			project = return_project(current_user.username, project_name)
+			update_level_percents(current_user.username, project_name, project.duration, new_duration)
+		# Edit the project info.
+		edit_level(current_user.username, project_name, level_name, 
+		name, is_done, start_date, end_date, descrip)
+		# Updating the percents of the project.
+		levels = return_project_levels(current_user.username, project_name)
+		new_percents = percents_ready(levels)
+		update_percents(current_user.username, project_name, new_percents)
+		# redirect to projects.
+		return redirect('/projects')
+	level_object = return_level(current_user.username, level_name, project_name)
+	return render_template("edit_level.html", level = level_object, today = today, project_str = project_str)	
 
 if __name__ == '__main__':
-    app.run(debug=True)
+# check date, send messages?
+	
+	app.run(debug = True)
+	#, ssl_context = "adhoc"

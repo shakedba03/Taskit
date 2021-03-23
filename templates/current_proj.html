@@ -113,7 +113,9 @@
                             <h4>תאריך התחלה: {{ project_object.start_date }}</h4><br>
                             <h4>תאריך הגשה: {{ project_object.end_date }}</h4><br>
                             <h4>תאריך סיום השלב הקרוב: {{ due_date }}</h4>
-                            <form method="GET" action="/project_edit">
+                            <form method="POST" action="/temp_edit">
+                                <input type="hidden" name="project_name" 
+                                value = '{{ project_object.name }}' >
                                 <button type="submit" class="btn-hover color-10">עריכה</button>
                             </form>
                         </div>
@@ -152,6 +154,7 @@
             </div>
             <div class="row">
                 {% for level in levels_list %}
+                {% if level.is_done == False %}
                 <div class="col-xl-3 col-md-6 col-lg-6">
                     <div class="flip-card">
                         <div class="flip-card-inner">
@@ -176,62 +179,19 @@
                                 <h7>{{ level.description}}</h7>
                                 <br>
                                 <br>
-                                <form method="POST" action="/edit_level">
+                                <form method="POST" action="/temp_edit_level">
                                     <input type="hidden" name="level_name" 
                                     value = '{{ level.name }}' >
+                                    <input type="hidden" name="p_name" 
+                                    value = '{{ project_object.name }}' >
                                     <button type="submit" class="btn-hover color-10">עריכה</button>
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
+                {% endif %}
                 {% endfor %}
-                <!-- <div class="col-xl-3 col-md-6 col-lg-6">
-                    <div class="flip-card">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <div style=" width: 15%;height: 15%;position: relative;top:5%;right: 2%;
-                                border-radius: 50%;
-                                background-color: rgb(250, 78, 10);"></div>           
-                                <h3 style= "display: inline;position:absolute;top:5%;left: 4%">50%</h3>
-                                <h2 style="position:relative;top:10%;">שם הפרוייקט</h2>
-                                <h3 style="position:relative;top:13%;">מקצוע: </h3>
-                                <h3 style="position:relative;top:20%;">הגשה: 16.2.2021</h3>
-                            </div>
-                            <div class="flip-card-back">
-                                <h7>תיאור: כאן כתוב התיאור של כל פרוייקט. יש הגבלה על מספר התווים של התיאור.</h7>
-                                <br>
-                                <br>
-                                <h8>שם השלב: 12.12.2020</h8>
-                                <button type="submit" class="btn-hover color-10" id="submit">צפייה בפרוייקט</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-3 col-md-6 col-lg-6">
-                    <div class="flip-card">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <div style=" width: 15%;height: 15%;position: relative;top:5%;right: 2%;
-                                border-radius: 50%;
-                                background-color: rgb(223, 2, 2);"></div>           
-                                <h3 style= "display: inline;position:absolute;top:5%;left: 4%">50%</h3>
-                                <h2 style="position:relative;top:10%;">שם הפרויקט</h2>
-                                <h3 style="position:relative;top:13%;">מקצוע: </h3>
-                                <h3 style="position:relative;top:20%;">הגשה: 16.2.2021</h3>
-                            </div>
-                            <div class="flip-card-back">
-                                <h7>תיאור: כאן כתוב התיאור של כל פרוייקט. יש הגבלה על מספר התווים של התיאור.</h7>
-                                <br>
-                                <br>
-                                <h8>שם השלב: 12.12.2020</h8> 
-                                <button type="submit" class="btn-hover color-10" id="submit">צפייה בפרוייקט</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                 -->
             </div>
         </div>
     </div>
@@ -252,78 +212,48 @@
                 </div>
             </div>
             <div class="row">
+                {% for level in levels_list %}
+                {% if level.is_done == True %}
                 <div class="col-xl-3 col-md-6 col-lg-6">
                     <div class="flip-card">
                         <div class="flip-card-inner">
                             <div class="flip-card-front">
-                                <div style=" width: 15%;height: 15%;position: relative;top:5%;right: 2%;
-                                border-radius: 50%;
-                                background-color: rgb(26, 168, 8);"></div>           
-                                <h3 style= "display: inline;position:absolute;top:5%;left: 4%">50%</h3>
-                                <h2 style="position:relative;top:10%;">שם הפרויקט</h2>
-                                <h3 style="position:relative;top:13%;">מקצוע: </h3>
-                                <h3 style="position:relative;top:20%;">הגשה: 16.2.2021</h3>
+                                <div id="dotColor">
+                                    <style>
+                                        #dotColor{
+                                            width: 15%;
+                                            height: 15%;
+                                            position:relative;
+                                            top:5%;
+                                            right: 2%;
+                                            border-radius: 50%;
+                                            background-color: {{ level.color}};
+                                        }
+                                   </style>
+                                </div>           
+                                <h2 style="position:relative;top:10%;">{{level.name }}</h2>
+                                <h4 style="position:relative;top:20%;"> הגשה: {{ level.end_date }}</h4>
                             </div>
                             <div class="flip-card-back">
-                                <h7>תיאור: כאן כתוב התיאור של כל פרוייקט. יש הגבלה על מספר התווים של התיאור.</h7>
+                                <h7>{{ level.description}}</h7>
                                 <br>
                                 <br>
-                                <h8>שם השלב: 12.12.2020</h8>
-                                <button type="submit" class="btn-hover color-10" id="submit">צפייה בפרוייקט</button>
+                                <form method="POST" action="/temp_edit_level">
+                                    <input type="hidden" name="level_name" 
+                                    value = '{{ level.name }}' >
+                                    <input type="hidden" name="p_name" 
+                                    value = '{{ project_object.name }}' >
+                                    <button type="submit" class="btn-hover color-10">עריכה</button>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-xl-3 col-md-6 col-lg-6">
-                    <div class="flip-card">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <div style=" width: 15%;height: 15%;position: relative;top:5%;right: 2%;
-                                border-radius: 50%;
-                                background-color: rgb(250, 78, 10);"></div>           
-                                <h3 style= "display: inline;position:absolute;top:5%;left: 4%">50%</h3>
-                                <h2 style="position:relative;top:10%;">שם הפרוייקט</h2>
-                                <h3 style="position:relative;top:13%;">מקצוע: </h3>
-                                <h3 style="position:relative;top:20%;">הגשה: 16.2.2021</h3>
-                            </div>
-                            <div class="flip-card-back">
-                                <h7>תיאור: כאן כתוב התיאור של כל פרוייקט. יש הגבלה על מספר התווים של התיאור.</h7>
-                                <br>
-                                <br>
-                                <h8>שם השלב: 12.12.2020</h8>
-                                <button type="submit" class="btn-hover color-10" id="submit">צפייה בפרוייקט</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-3 col-md-6 col-lg-6">
-                    <div class="flip-card">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <div style=" width: 15%;height: 15%;position: relative;top:5%;right: 2%;
-                                border-radius: 50%;
-                                background-color: rgb(223, 2, 2);"></div>           
-                                <h3 style= "display: inline;position:absolute;top:5%;left: 4%">50%</h3>
-                                <h2 style="position:relative;top:10%;">שם הפרויקט</h2>
-                                <h3 style="position:relative;top:13%;">מקצוע: </h3>
-                                <h3 style="position:relative;top:20%;">הגשה: 16.2.2021</h3>
-                            </div>
-                            <div class="flip-card-back">
-                                <h7>תיאור: כאן כתוב התיאור של כל פרוייקט. יש הגבלה על מספר התווים של התיאור.</h7>
-                                <br>
-                                <br>
-                                <h8>שם השלב: 12.12.2020</h8> 
-                                <button type="submit" class="btn-hover color-10" id="submit">צפייה בפרוייקט</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% endif %}
+                {% endfor %}
                 
             </div>
         </div>
-    </div>
     </div>
     <!-- our_courses_end -->
 

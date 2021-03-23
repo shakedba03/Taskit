@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, Float, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, Float, Boolean, DateTime, insert
 from sqlalchemy.ext.declarative import declarative_base
 
 
 Base = declarative_base()
+
 
 class Users(Base):
     __tablename__ = 'users'
@@ -44,3 +45,7 @@ class Levels(Base):
     is_done = Column(Boolean) #
     color = Column(String) #
     
+# class Subjects(Base):
+#     __tablename__ = 'subjects'
+#     id = Column(Integer, primary_key = True)
+#     name = Column("name", Integer, server_default= "50")

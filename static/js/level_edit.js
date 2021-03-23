@@ -8,41 +8,29 @@ var isAfterStartDate = function(startDateStr, endDateStr) {
 
 };
 
-var isValidEditStart = function(pStart) {
-    levels = document.getElementsByName("level");
-    for(var i = 0; i < levels.length; i++){
-        var strLevel = levels[i].value;
-        var data = strLevel.split(",");
-        sDate = new Date(data[0]);
-        pStart = new Date(pStart);
-        isDone = data[1];
-        if(sDate < pStart && isDone == "False"){
-            return false;
-        }
-        
+var isValidEditStart = function(lStart) {
+    var lStart = new Date(lStart);
+    var pInfo = document.getElementsByName("project_str")[0].value;
+    pInfo = pInfo.split(",");
+    var pStart = new Date(pInfo[0]);
+    if(pStart > lStart){
+        return false;
     }
     return true;
-    };
 
-var isValidEditEnd = function(pEnd) {
-    levels = document.getElementsByName("level");
-    for(var i = 0; i < levels.length; i++){
-        var strLevel = levels[i].value;
-        var data = strLevel.split(",");
-        eDate = new Date(data[2]);
-        pEnd = new Date(pEnd);
-        isDone = data[1];
-        alert(eDate);
-        alert(pEnd);
-        alert(eDate > pEnd && isDone == "False");
-        if(eDate > pEnd && isDone == "False"){
-            return false;
-        }
-    
+};
+
+var isValidEditEnd = function(lEnd) {
+    var lEnd = new Date(lEnd);
+    var pInfo = document.getElementsByName("project_str")[0].value;
+    pInfo = pInfo.split(",");
+    var pEnd = new Date(pInfo[1]);
+    if(pEnd < lEnd){
+        return false;
     }
     return true;
-    };
 
+};
 
 $(document).ready(function(){
     
@@ -62,16 +50,16 @@ $(document).ready(function(){
     jQuery.validator.addMethod("isValidEditStart", function(value, element) {
 
         return isValidEditStart($('#start_date').val(), value);
-    }, "לא ניתן להחיל את השינוי כיוון שתאריך ההתחלה החדש מבטל שלבים בפרויקט. יש לשנות את השלבים או למחוק אותם.");
+    }, "לא ניתן להחיל את השינוי כיוון שתאריך ההתחלה החדש מוקדם מתאריך התחלת הפרויקט.");
 
     jQuery.validator.addMethod("isValidEditEnd", function(value, element) {
 
         return isValidEditEnd($('#end_date').val(), value);
-    }, "לא ניתן להחיל את השינוי כיוון שתאריך הסיום החדש מבטל שלבים בפרויקט. יש לשנות את השלבים או למחוק אותם.");
+    }, "לא ניתן להחיל את השינוי כיוון שתאריך הסיום החדש מאוחר מתאריך סיום הפרויקט.");
 
     // validate contactForm form
     $(function() {
-        $('#projectEdit').validate({
+        $('#levelEdit').validate({
             rules: {
                 name: {
                     required: false,
@@ -84,8 +72,6 @@ $(document).ready(function(){
                 start_date: {
                     required: false,
                     isValidEditStart: true,
-                    
-                    
                 },
                 end_date: {
                     required: false,
@@ -127,24 +113,24 @@ $(document).ready(function(){
                 $(form).ajaxSubmit({
                     type:"POST",
                     data: $(form).serialize(),
-                    url:"/project_edit",
+                    url:"/level_edit",
                     success: function() {
                         
                         $('.alert').alert()
-                        $('#projectEdit :input').attr('disabled', 'disabled');
+                        $('#levelEdit :input').attr('disabled', 'disabled');
                         
-                        $('#projectEdit').fadeTo( "slow", 1, function() {
+                        $('#levelEdit').fadeTo( "slow", 1, function() {
                             $(this).find(':input').attr('disabled', 'disabled');
                             $(this).find('label').css('cursor','default');
                             $('#success').fadeIn()
                             $('.modal').modal('hide');
 		                	$('#success').modal('show');
                             alert("העדכון הושלם.")
-                            // window.location.href ='/project_edit';
+                            window.location.href ='/projects';
                         })
                     },
                     error: function() {
-                        $('#projectEdit').fadeTo( "slow", 1, function() {
+                        $('#levelEdit').fadeTo( "slow", 1, function() {
                             $('#error').fadeIn()
                             $('.modal').modal('hide');
 		                	$('#error').modal('show');

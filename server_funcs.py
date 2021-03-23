@@ -44,7 +44,7 @@ def get_color(end_date):
     return color
 
 def percents_ready(levels_list):
-    # Gets a list of a projct's levels.
+    # Gets a list of a project's levels.
     # Returns how much of the project is done in percents. (int)
     percents = 0
     for level in levels_list:
@@ -53,13 +53,12 @@ def percents_ready(levels_list):
     return percents
 
 def fix_sum_percents(levels_list, p_start, p_end, p_duration, from_project, username):
-    # Gets a list of a projct's levels.
+    # Gets a list of a project's levels.
     # checks that the total sum of the percents = 100%.
     # If not, it fixes the percents.
     total_percent_sum = 0
     for level in levels_list:
         total_percent_sum += level.percent
-
     if total_percent_sum < 100:
         first_level_start = format_date(levels_list[0].start_date)
         project_start = format_date(p_start)
@@ -69,13 +68,12 @@ def fix_sum_percents(levels_list, p_start, p_end, p_duration, from_project, user
         if first_level_start != project_start:
             duration_start = levels_list[0].duration + duration_calc(project_start, first_level_start)
             # update the level's percent in the DB
-            update_level_percents(username, from_project, levels_list[0].level_num, p_duration, duration_start)
+            update_level_percents(username, from_project, p_duration, duration_start)
 
         if last_level_end != p_end:
             duration_end = levels_list[len(levels_list) - 1].duration + duration_calc(project_end, last_level_end)
             # update the level's percent in the DB
-            update_level_percents(username, from_project, levels_list[len(levels_list) - 1].level_num, 
-            p_duration, duration_end)
+            update_level_percents(username, from_project, p_duration, duration_end)
 
 def return_closest_due(levels_list):
     # Gets a list of all levels, returns the closest due level.
@@ -95,3 +93,30 @@ def return_closest_due(levels_list):
             break
     return closest_due
         
+# def add_all_subjects():
+#     add_subject("אנגלית")
+#     add_subject("מתמטיקה")
+#     add_subject("ספרות")
+#     add_subject("מדעי המחשב")
+#     add_subject("סייבר")
+#     add_subject("אזרחות")
+#     add_subject("מדעי החברה")
+#     add_subject("אומנות")
+#     add_subject("ביולוגיה")
+#     add_subject("חנג")
+#     add_subject("תנך")
+#     add_subject("היסטוריה")
+
+
+def make_str_levels(levels):
+    # Gets a levels list, returns a string for each level that contains the s_date, is_done and e_date.
+    ret_list = []
+    for level in levels:
+        print(type(level.start_date))
+        ret_list.append(str(level.start_date) + "," + str(level.is_done) + "," + str(level.end_date))
+    return ret_list
+
+def make_str_project(project):
+    # Gets a project, returns a string that contains the s_date and e_date.
+    ret_str = project.start_date + "," + project.end_date
+    return ret_str
