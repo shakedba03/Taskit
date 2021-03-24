@@ -118,6 +118,11 @@
                                 value = '{{ project_object.name }}' >
                                 <button type="submit" class="btn-hover color-10">עריכה</button>
                             </form>
+                            <form method="POST" action="/delete_proj" onsubmit="return confirm('האם את/ה בטוח/ה?');">
+                                <input type="hidden" name="project_name" 
+                                value = '{{ project_object.name }}' >
+                                <button type="submit" class="btn-hover color-10">מחיקת פרוייקט</button>
+                            </form>
                         </div>
                         <div class="flex-wrapper">
                             <div class="single-chart">

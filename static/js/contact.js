@@ -8,6 +8,21 @@ var isAfterStartDate = function(startDateStr, endDateStr) {
 
 };
 
+var isSameName = function(newProjectName) {
+    var allNames = document.getElementsByName("names");
+    for(var i = 0; i < allNames.length; i++){
+        alert(allNames[i].value);
+        alert(allNames[i].value == newProjectName);
+        if(allNames[i].value == newProjectName) {
+            return false;
+        }
+    
+    }
+    return true;
+   
+};
+
+
 $(document).ready(function(){
     
     (function($) {
@@ -22,6 +37,12 @@ $(document).ready(function(){
         return isAfterStartDate($('#start_date').val(), value);
     }, "תאריך הסיום צריך להיות לאחר תאריך ההתחלה.");
 
+    jQuery.validator.addMethod("isSameName", function(value, element) {
+
+        return isSameName($('#name').val(), value);
+    }, "קיים פרוייקט בשם זה, נא לבחור שם אחר.");
+
+
 
     // validate contactForm form
     $(function() {
@@ -29,7 +50,8 @@ $(document).ready(function(){
             rules: {
                 name: {
                     required: true,
-                    minlength: 2
+                    minlength: 2,
+                    isSameName: true,
                 },
                 subject: {
                     required: true,

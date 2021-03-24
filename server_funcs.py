@@ -1,6 +1,6 @@
 import datetime as dt
 from datetime import datetime
-from databases import return_project_levels, update_level_percents
+from databases import *
 import sys
 
 def format_date(date):
@@ -26,7 +26,7 @@ def verify_user_projects(username, projects_list):
 
     for project in projects_list:
         levels_objects_list = return_project_levels(username, project.name)
-        fix_sum_percents(levels_objects_list, project.start_date, project.end_date, project.duration, project.name, username)
+       # fix_sum_percents(levels_objects_list, project.duration, project.name, username)
         project.percents_ready = percents_ready(levels_objects_list)
     
     return projects_list
@@ -52,28 +52,24 @@ def percents_ready(levels_list):
             percents += level.percent
     return percents
 
-def fix_sum_percents(levels_list, p_start, p_end, p_duration, from_project, username):
+def fix_sum_percents(levels_list, p_duration, from_project, username):
     # Gets a list of a project's levels.
     # checks that the total sum of the percents = 100%.
     # If not, it fixes the percents.
-    total_percent_sum = 0
+    done_levels = []
     for level in levels_list:
-        total_percent_sum += level.percent
-    if total_percent_sum < 100:
-        first_level_start = format_date(levels_list[0].start_date)
-        project_start = format_date(p_start)
-        last_level_end = format_date(levels_list[len(levels_list) - 1].end_date)
-        project_end = format_date(p_end)
+        print(f'BEFORE update: {level.percent}')
+        l_duration = duration_calc(level.start_date, level.end_date)
+        update_level_percents(username, from_project, level.name, p_duration, l_duration)
+        if level.is_done == True:
+            updated_level = return_level(username, level.name, from_project)
+            done_levels.append(updated_level)
+    
+    new_ready_percents = 0
+    for item in done_levels:
+        new_ready_percents += item.percent
+    update_percents(username, from_project, new_ready_percents)
 
-        if first_level_start != project_start:
-            duration_start = levels_list[0].duration + duration_calc(project_start, first_level_start)
-            # update the level's percent in the DB
-            update_level_percents(username, from_project, p_duration, duration_start)
-
-        if last_level_end != p_end:
-            duration_end = levels_list[len(levels_list) - 1].duration + duration_calc(project_end, last_level_end)
-            # update the level's percent in the DB
-            update_level_percents(username, from_project, p_duration, duration_end)
 
 def return_closest_due(levels_list):
     # Gets a list of all levels, returns the closest due level.
@@ -112,11 +108,23 @@ def make_str_levels(levels):
     # Gets a levels list, returns a string for each level that contains the s_date, is_done and e_date.
     ret_list = []
     for level in levels:
-        print(type(level.start_date))
-        ret_list.append(str(level.start_date) + "," + str(level.is_done) + "," + str(level.end_date))
+        ret_list.append(level.start_date + "," + str(level.is_done) + "," + level.end_date)
     return ret_list
 
 def make_str_project(project):
     # Gets a project, returns a string that contains the s_date and e_date.
     ret_str = project.start_date + "," + project.end_date
     return ret_str
+
+def calc_new_duration(levels):
+    new_duration = 0
+    for level in levels:
+        new_duration += level.duration
+    return new_duration
+
+
+def get_name_list(items):
+    names_list = []
+    for item in items:
+        names_list.append(item.name)
+    return names_list

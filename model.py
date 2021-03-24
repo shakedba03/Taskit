@@ -12,7 +12,6 @@ class Users(Base):
     password = Column(String)
     email = Column(String)
     active_projects = Column(Integer)
-    submited_projects = Column(Integer)
     total_porject_num = Column(Integer)
 
 class Projects(Base):

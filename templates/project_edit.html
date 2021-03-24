@@ -156,6 +156,9 @@
                     {% for level in levels_str %}
                     <input type="hidden" name="level" id="level" value="{{ level }}">
                     {% endfor %}
+                    {% for name in all_projects_names %}
+                    <input type="hidden" name="names" id="names" value="{{ name }}">
+                    {% endfor %}
                     <button type="submit" class="btn-hover color-10">סיום</button>      
                 </form>
             </div>

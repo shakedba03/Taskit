@@ -71,7 +71,9 @@ def projects():
 	projects_due_dict = {}
 	# print("at all projects: TOTAL PROJECTS NUM is " + str(current_user.total_porject_num)) ---> DELETE IT
 	if current_user.total_porject_num != 0:
+		# checking the percents of the project and levels.
 		user_projects = verify_user_projects(current_user.username, user_projects)
+		
 		for project in user_projects:
 			levels = return_project_levels(current_user.username, project.name)
 			projects_due_dict[project] = return_closest_due(levels)
@@ -88,14 +90,13 @@ def new_project():
 		subject = request.form['subject']
 		p_start_date = request.form['start_val']
 		p_end_date = request.form['end_val']
-		p_duration = duration_calc(p_start_date, p_end_date) ##################
+		# p_duration = duration_calc(p_start_date, p_end_date) ##################
+		p_duration = 0
 		p_descrip = request.form['message']
 		owner = current_user.username
 		color = get_color(p_end_date)
 		percents_ready = 0
 		# Adding a new project to the projects table.
-		add_project(p_name, subject, p_start_date,
-					p_end_date, p_duration, p_descrip, owner, color, percents_ready)
 
 		for i in range(1, 16):
 			try:
@@ -107,26 +108,38 @@ def new_project():
 				level_num = i
 				from_p = p_name
 				level_duration = duration_calc(level_start, level_end)
-				percent = (level_duration / p_duration) * 100
+				# percent = (level_duration / p_duration) * 100
+				p_duration += level_duration
 				level_color = get_color(level_end)
 				# Adding the project's levels to the levels table.
 				add_level(level_name, level_num, level_start,
-				level_end, level_duration, percent, level_descrip, from_p, owner, level_color)
+				level_end, level_duration, level_descrip, from_p, owner, level_color)
 			except:
 				pass
-		
+		# adding the project to the Projects table.
+		add_project(p_name, subject, p_start_date,
+		p_end_date, p_duration, p_descrip, owner, color, percents_ready)
+		# upadating the active projects of the user in the Users table.
 		update_active_proj_num(current_user.username)
-		# current_user = return_user(current_user.username)
-		return render_template("projects.html")
-	return render_template("new_project.html", today = today)
+		levels = return_project_levels(current_user.username, p_name)
+		# adjusting the percents of each level.
+		fix_sum_percents(levels, p_duration, p_name, current_user.username)
+		return redirect('/projects')
+	# pulling all user's project from the DB into a hidden input in the html.
+	user_projects = return_user_projects(current_user.username)
+	all_projects_names = get_name_list(user_projects)
+	return render_template("new_project.html", today = today, all_projects_names = all_projects_names)
 
 @app.route('/current_proj/<project_name>', methods=['GET', 'POST'])
 def current_proj(project_name):
 	global current_user
 	project_object = return_project(current_user.username, project_name)
 	project_levels = return_project_levels(current_user.username, project_object.name)
-	due_level = return_closest_due(project_levels)
-	return render_template("current_proj.html", project_object = project_object, due_date = due_level.end_date,
+	due_date = "-"
+	if project_object.percents_ready != 100:
+		due_level = return_closest_due(project_levels)
+		due_date = due_level.end_date
+	return render_template("current_proj.html", project_object = project_object, due_date = due_date,
 	levels_list = project_levels)
 
 
@@ -156,9 +169,12 @@ def project_edit():
 		update_from_proj(current_user.username, project_name, name)
 		edit_project(current_user.username, project_name, name, start_date, end_date, subject, descrip)
 		return redirect('/projects')
-		
+	
+	# pulling all user's project from the DB into a hidden input in the html.
+	user_projects = return_user_projects(current_user.username)
+	all_projects_names = get_name_list(user_projects)	
 	return render_template("project_edit.html", project = project_object, today = today,
-	levels_str = levels_str)
+	levels_str = levels_str, all_projects_names = all_projects_names)
 
 @app.route('/temp_edit_level', methods=['POST'])
 def temp_edit_level():
@@ -175,6 +191,7 @@ def level_edit():
 	today = datetime.today().strftime('%Y-%m-%d')
 	project = return_project(current_user.username, project_name)
 	project_str = make_str_project(project)
+	levels = return_project_levels(current_user.username, project_name)
 	if request.method == "POST":
 		print(level_name)
 		name = request.form["name"]
@@ -188,19 +205,53 @@ def level_edit():
 		if start_date or end_date:
 			new_duration = duration_calc(start_date, end_date)
 			project = return_project(current_user.username, project_name)
-			update_level_percents(current_user.username, project_name, project.duration, new_duration)
+			p_duration = calc_new_duration(levels)
+			update_project_duration(current_user.username, project_name, p_duration)
+			update_level_percents(current_user.username, project_name, level_name, project.duration, new_duration)
+			
 		# Edit the project info.
 		edit_level(current_user.username, project_name, level_name, 
 		name, is_done, start_date, end_date, descrip)
 		# Updating the percents of the project.
 		levels = return_project_levels(current_user.username, project_name)
 		new_percents = percents_ready(levels)
+		print(new_percents)
 		update_percents(current_user.username, project_name, new_percents)
 		# redirect to projects.
 		return redirect('/projects')
 	level_object = return_level(current_user.username, level_name, project_name)
-	return render_template("edit_level.html", level = level_object, today = today, project_str = project_str)	
+	return render_template("edit_level.html", level = level_object, today = today, project_str = project_str)
 
+@app.route('/delete_proj', methods=['GET', 'POST'])
+def delete_proj():
+	global current_user
+	# Get the delete name
+	project_name = request.form['project_name']
+	delete_project(current_user.username, project_name)
+	# Delete the project's levels:
+	delete_all_levels(current_user.username, project_name)
+	return redirect('/projects')
+
+@app.route('/del_level', methods=['POST'])
+def del_level():
+	global current_user
+	# Get the delete info
+	project_name = request.form['from_p']
+	level_name = request.form['del_level_name']
+	level_num = request.form["num"]
+	# delete the requested level.
+	delete_level(current_user.username, project_name, level_name, level_num)
+	# check if there are other levels in the project. if not, delete the project.
+	levels = return_project_levels(current_user.username, project_name)
+	if not levels:
+		delete_project(current_user.username, project_name)
+		return redirect('/projects')
+	# calc the new duration of the project, change the percents of other levels.
+	new_proj_duration = calc_new_duration(levels)
+	fix_sum_percents(levels, new_proj_duration, project_name, current_user.username)
+	# update the duration of the project.
+	update_project_duration(current_user.username, project_name, new_proj_duration)	
+	return redirect('/projects')
 if __name__ == '__main__':
 # check date, send messages?
 	

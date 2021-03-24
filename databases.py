@@ -17,31 +17,35 @@ def add_user(username, password, email):
     password = password,
     email = email,
     active_projects = 0,
-    submited_projects = 0,
     total_porject_num = 0)
     session.add(user_object)
     session.commit()
 
-def del_user(id):
+
+def delete_user(username):
     session = DBSession()
-    session.query(Users).filter_by(id = id).delete()
+    session.query(Users).filter_by(username = username).delete()
     session.commit()
+
 
 def return_all_users():
     session = DBSession()
     users = session.query(Users).all()
     return users
 
+
 def return_user(username):
     session = DBSession()
     user = session.query(Users).filter_by(username = username).first()
     return user
+
 
 def update_active_proj_num(username):
     user_object = session.query(Users).filter_by(username = username).first()
     user_object.active_projects += 1
     user_object.total_porject_num += 1
     session.commit()
+
 
 #############################################################################################################
 def add_project(name, subject, start_date, end_date, duration, description, owner, color, percents_ready):
@@ -78,6 +82,7 @@ def update_percents(owner, name, percents):
     project.percents_ready = percents
     session.commit()
 
+
 def edit_project(username, name, new_name, s_date, e_date, subject, descrip):
     session = DBSession()
     project_object = session.query(Projects).filter_by(owner = username, name = name).first()
@@ -92,9 +97,23 @@ def edit_project(username, name, new_name, s_date, e_date, subject, descrip):
     if subject:
         project_object.subject = subject
     session.commit()
+    
+
+def update_project_duration(username, p_name, new_duration):
+    session = DBSession()
+    project_object = session.query(Projects).filter_by(owner = username, name = p_name).first()
+    project_object.duration = new_duration
+    session.commit()
+
+
+def delete_project(owner, project_name):
+    session = DBSession()
+    session.query(Projects).filter_by(owner = owner, name = project_name).delete()
+    session.commit()
+
 
 #############################################################################################################
-def add_level(name, level_num, start_date, end_date, duration, percent, description, from_project, owner, color):
+def add_level(name, level_num, start_date, end_date, duration, description, from_project, owner, color):
     session = DBSession()
     level_object = Levels(
     name = name,
@@ -102,7 +121,7 @@ def add_level(name, level_num, start_date, end_date, duration, percent, descript
     start_date = start_date,
     end_date = end_date,
     duration = duration, 
-    percent = percent,
+    percent = 0,
     description = description,
     from_project = from_project,
     owner = owner,
@@ -123,10 +142,15 @@ def return_level(owner, level_name, from_project):
     level = session.query(Levels).filter_by(owner = owner, name = level_name, from_project = from_project).first()
     return level
 
-def update_level_percents(owner, from_project, project_duration, new_duration):
-    level_object = session.query(Levels).filter_by(owner = owner, from_project = from_project).first()
-    level_object.percent = (new_duration / project_duration) * 100
+
+def update_level_percents(owner, from_project, name, project_duration, new_duration):
+    session = DBSession()
+    level_object = session.query(Levels).filter_by(owner = owner, from_project = from_project, name = name).first()
+    level_object.percent = round((new_duration / project_duration) * 100)
+    print("FROM the DB func:")
+    print(level_object.name + ": " + str(level_object.percent))
     session.commit()
+
 
 def update_from_proj(username, prev_name, new_name):
     levels_list = session.query(Levels).filter_by(owner = username, from_project = prev_name ).all()
@@ -134,6 +158,7 @@ def update_from_proj(username, prev_name, new_name):
         for level in levels_list:
             level.from_project = new_name
         session.commit()
+
 
 def edit_level(owner, from_project, name, new_name, is_done, s_date, e_date, descrip):
     session = DBSession()
@@ -148,6 +173,19 @@ def edit_level(owner, from_project, name, new_name, is_done, s_date, e_date, des
         level_object.description = descrip
     if is_done != level_object.is_done:
         level_object.is_done = is_done
+    session.commit()
+
+
+def delete_all_levels(owner, project_name):
+    session = DBSession()
+    session.query(Levels).filter_by(owner = owner, from_project = project_name).delete()
+    session.commit()
+
+
+def delete_level(owner, project_name, level_name, level_num):
+    session = DBSession()
+    session.query(Levels).filter_by(owner = owner, from_project = project_name, name = level_name,
+    level_num = level_num).delete()
     session.commit()
 ############################################################################################################
 # def add_subjects(name_list):
