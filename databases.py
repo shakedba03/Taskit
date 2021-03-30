@@ -1,4 +1,4 @@
-from model import Base, Users, Projects, Levels
+from model import Base, Users, Projects, Levels, Subjects
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -41,12 +41,19 @@ def return_user(username):
 
 
 def update_active_proj_num(username):
+    session = DBSession()
     user_object = session.query(Users).filter_by(username = username).first()
     user_object.active_projects += 1
     user_object.total_porject_num += 1
     session.commit()
 
-
+def return_emails():
+    session = DBSession()
+    users = session.query(Users).all()
+    emails = []
+    for user in users:
+        emails.append(user.email)
+    return emails
 #############################################################################################################
 def add_project(name, subject, start_date, end_date, duration, description, owner, color, percents_ready):
     session = DBSession()
@@ -60,7 +67,10 @@ def add_project(name, subject, start_date, end_date, duration, description, owne
     owner = owner, 
     is_active = True,
     color = color,
-    percents_ready = percents_ready)
+    percents_ready = percents_ready,
+    first_alert = False,
+    second_alert = False,
+    third_alert = False)
     session.add(project_object)
     session.commit()
 
@@ -112,6 +122,16 @@ def delete_project(owner, project_name):
     session.commit()
 
 
+def update_alert_status(owner, name, alert_num):
+    session = DBSession()
+    project_object = session.query(Projects).filter_by(owner = owner, name = name).first()
+    if alert_num == 1:
+        project_object.first_alert = True
+    elif alert_num == 2:
+        project_object.second_alert = True
+    elif alert_num == 3:
+        project_object.third_alert = True
+    session.commit()
 #############################################################################################################
 def add_level(name, level_num, start_date, end_date, duration, description, from_project, owner, color):
     session = DBSession()
@@ -188,15 +208,15 @@ def delete_level(owner, project_name, level_name, level_num):
     level_num = level_num).delete()
     session.commit()
 ############################################################################################################
-# def add_subjects(name_list):
-#     session = DBSession()
-#     for name in name_list:
-#         subject_object = Subjects(name = name)
-#         session.add(subject_object)
-#         session.commit()
+def add_subjects(name_list):
+    session = DBSession()
+    for name in name_list:
+        subject_object = Subjects(name = name)
+        session.add(subject_object)
+        session.commit()
 
-# def return_subjects():
-#     session = DBSession()
-#     subjects = session.query(Subjects).all()
-#     return subjects
+def return_subjects():
+    session = DBSession()
+    subjects = session.query(Subjects).all()
+    return subjects
 

@@ -89,20 +89,6 @@ def return_closest_due(levels_list):
             break
     return closest_due
         
-# def add_all_subjects():
-#     add_subject("אנגלית")
-#     add_subject("מתמטיקה")
-#     add_subject("ספרות")
-#     add_subject("מדעי המחשב")
-#     add_subject("סייבר")
-#     add_subject("אזרחות")
-#     add_subject("מדעי החברה")
-#     add_subject("אומנות")
-#     add_subject("ביולוגיה")
-#     add_subject("חנג")
-#     add_subject("תנך")
-#     add_subject("היסטוריה")
-
 
 def make_str_levels(levels):
     # Gets a levels list, returns a string for each level that contains the s_date, is_done and e_date.
@@ -128,3 +114,31 @@ def get_name_list(items):
     for item in items:
         names_list.append(item.name)
     return names_list
+
+
+def project_submission_alert(user):
+    alerts_dict = {}
+    today = datetime.today().strftime("%Y-%m-%d")
+
+    user_projects = return_user_projects(user.username)
+    for project in user_projects:
+        end_date = format_date(project.end_date)
+        if duration_calc(today, end_date) == 1:
+            alerts_dict[project.name] = 1
+        elif duration_calc(today, end_date) == 0:
+            alerts_dict[project.name] = 2
+        elif duration_calc(today, end_date) < 0:
+            alerts_dict[project.name] = 3
+    return alerts_dict
+# def level_submission_alert():
+#     users = return_all_users()
+#     if not users:
+#         return
+#     for user in users:
+#         user_projects = return_user_projects(user.username)
+#         for project in user_projects:
+#             levels = return_project_levels(user.username, project.name)
+#             due_level = return_closest_due(levels)
+            
+        
+        

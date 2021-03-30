@@ -120,10 +120,10 @@
                                         <select class="form-control valid" name="subject" id="subject" required
                                             style="height: 80%;">
                                             <option value="">מקצוע</option>
-                                            <option value="אנגלית">
-                                                אנגלית</option>
-                                            <option value="מתמטיקה">
-                                                מתמטיקה</option>
+                                            {% for subject in all_subjects %}
+                                            <option value="{{ subject.name }}">
+                                                {{ subject.name }}</option>
+                                            {% endfor %}
 
                                         </select>
                                     </div>

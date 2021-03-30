@@ -2,11 +2,22 @@ from flask import *
 from model import *
 from databases import *
 from server_funcs import *
+from flask_mail import *
 from datetime import datetime
-from OpenSSL import SSL
+import threading
 
 app = Flask(__name__)
 app.secret_key = "MY_SUPER_SECRET_KEY"
+
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'taskitMail'
+app.config['MAIL_PASSWORD'] = 'cyberprojectpassword%'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+
+mail = Mail(app)
+
 
 current_user = None
 default_subjects = ["אנגלית", "מתמטיקה", "מדעי המחשב", "מדעי החברה", "סייבר", "ביולוגיה", "פיזיקה", "אומנות"]
@@ -16,7 +27,7 @@ level_name = ""
 @app.route('/', methods=['GET', 'POST'])
 def index():
 	global current_user, user_projects, default_subjects
-	#add_subjects(default_subjects)
+	
 	if request.method == 'POST':
 		username = request.form['username']
 		password = request.form['password']
@@ -27,6 +38,10 @@ def index():
 				# get the user's porjects and levels from the db.
 				current_user = return_user(username)
 				user_projects = return_user_projects(current_user.username)
+				# adding default sbjects to the DB.
+				check_subjects = return_subjects()
+				if not check_subjects:
+					add_subjects(default_subjects)
 				# print(current_user.username) ---> DELETE IT
 				# print("after login: TOTAL PROJECTS NUM is " + str(current_user.total_porject_num)) ---> DELETE IT
 				return redirect('/projects')
@@ -83,6 +98,7 @@ def projects():
 @app.route('/new_project', methods=['GET', 'POST'])
 def new_project():
 	global current_user
+	all_subjects = return_subjects()
 	today = datetime.today().strftime('%Y-%m-%d')
 	if request.method == 'POST':
 		# Getting the form data - project info.
@@ -128,7 +144,8 @@ def new_project():
 	# pulling all user's project from the DB into a hidden input in the html.
 	user_projects = return_user_projects(current_user.username)
 	all_projects_names = get_name_list(user_projects)
-	return render_template("new_project.html", today = today, all_projects_names = all_projects_names)
+	return render_template("new_project.html", today = today, all_projects_names = all_projects_names,
+	all_subjects = all_subjects)
 
 @app.route('/current_proj/<project_name>', methods=['GET', 'POST'])
 def current_proj(project_name):
@@ -252,8 +269,38 @@ def del_level():
 	# update the duration of the project.
 	update_project_duration(current_user.username, project_name, new_proj_duration)	
 	return redirect('/projects')
+
+def check_time():
+	users = return_all_users()
+	for user in users:
+		user_alerts = project_submission_alert(user)
+		if len(user_alerts.keys()) > 0:
+			for project in user_alerts:
+				project_object = return_project(user.username, project)
+				if not project_object.first_alert and user_alerts[project] == 1: 
+					msg = Message("תאריך הגשה של פרוייקט מתקרב", sender = 'taskitMail@gmail.com', recipients = [user.email])
+					msg.html = "<h1>" + user.username + ",</h1> <h3> תאריך ההגשה של הפרוייקט: " + project + " הוא מחר! " + "</h3>"
+					with app.app_context():
+						mail.send(msg)
+					update_alert_status(user.username, project_object.name, 1)
+				elif not project_object.second_alert and user_alerts[project] == 2: 
+					msg = Message("תאריך הגשה של פרוייקט", sender = 'taskitMail@gmail.com', recipients = [user.email])
+					msg.html = "<h1>" + user.username + ",</h1> <h3> תאריך ההגשה של הפרוייקט: " + project + "הוא היום!" + "</h3>"
+					with app.app_context():
+						mail.send(msg)
+					update_alert_status(user.username, project_object.name, 2)
+				elif not project_object.third_alert and user_alerts[project] == 3: 
+					msg = Message("תאריך הגשה של פרוייקט חלף...", sender = 'taskitMail@gmail.com', recipients = [user.email])
+					msg.html = "<h1>" + user.username + ",</h1> <h3> תאריך ההגשה של הפרוייקט: " + project + "היה אתמול והפרוייקט לא הוגש." + "</h3>"
+					with app.app_context():
+						mail.send(msg)	
+					update_alert_status(user.username, project_object.name, 3)			
+	threading.Timer(60.0, check_time).start()
+	
+
+
 if __name__ == '__main__':
 # check date, send messages?
-	
-	app.run(debug = True)
+	check_time()
+	app.run(debug = False)
 	#, ssl_context = "adhoc"
