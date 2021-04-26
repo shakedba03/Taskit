@@ -174,12 +174,19 @@ def return_level(owner, level_name, from_project):
 
 def update_level_percents(owner, from_project, name, project_duration, new_duration):
     session = DBSession()
+    print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+    print(project_duration)
     level_object = session.query(Levels).filter_by(owner = owner, from_project = from_project, name = name).first()
-    level_object.percent = round((new_duration / project_duration) * 100)
-    print("FROM the DB func:")
-    print(level_object.name + ": " + str(level_object.percent))
+    if new_duration != 0 and project_duration != 0:
+        
+        level_object.percent = round((new_duration / project_duration) * 100)
     session.commit()
 
+def update_level_duration(owner, from_project, name, new_level_duration):
+    session = DBSession()
+    level_object = session.query(Levels).filter_by(owner = owner, from_project = from_project, name = name).first()
+    level_object.duration = new_level_duration
+    session.commit()
 
 def update_l_color(owner, from_project, name, color):
     session = DBSession()

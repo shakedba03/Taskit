@@ -192,10 +192,10 @@
                                 <h4 style="position:relative;top:20%;"> הגשה: {{ key.end_date }}</h4>
                             </div>
                             <div class="flip-card-back">
-                                <h7>{{ key.description}}</h7>
+                                <p>{{ key.description}}</p>
                                 <br>
                                 <br>
-                                <h8>{{ user_projects[key].end_date }} : {{ user_projects[key].name }}</h8>
+                                <p>{{ user_projects[key].end_date }} : {{ user_projects[key].name }}</p>
                                 <form method="POST" action="/projects">
                                     <input type="hidden" name="project_name" 
                                     value = '{{ key.name }}' >

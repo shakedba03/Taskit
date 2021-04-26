@@ -2,7 +2,7 @@ var isAfterStartDate = function(startDateStr, endDateStr) {
     var inDate = new Date(startDateStr),
         eDate = new Date(endDateStr);
 
-    if(inDate < eDate) {
+    if(inDate <= eDate) {
         return true;
     }
 

@@ -220,14 +220,17 @@ def level_edit():
 		descrip = request.form["message"]
 		status = request.form["status"]
 		is_done = False
-		if status == "done":
-			is_done = True
 		if start_date or end_date:
 			new_duration = duration_calc(start_date, end_date)
+			update_level_duration(current_user.username, project_name, level_name, new_duration)
+			levels = return_project_levels(current_user.username, project_name)
 			project = return_project(current_user.username, project_name)
 			p_duration = calc_new_duration(levels)
 			update_project_duration(current_user.username, project_name, p_duration)
 			update_level_percents(current_user.username, project_name, level_name, project.duration, new_duration)
+		if status == "done":
+			is_done = True
+		
 			
 		# Edit the project info.
 		edit_level(current_user.username, project_name, level_name, 
@@ -235,7 +238,7 @@ def level_edit():
 		# Updating the percents of the project.
 		levels = return_project_levels(current_user.username, project_name)
 		new_percents = percents_ready(levels)
-		print(new_percents)
+		#print(new_percents)
 		update_percents(current_user.username, project_name, new_percents)
 		# redirect to projects.
 		return redirect('/projects')

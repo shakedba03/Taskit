@@ -58,7 +58,6 @@ def fix_sum_percents(levels_list, p_duration, from_project, username):
     # If not, it fixes the percents.
     done_levels = []
     for level in levels_list:
-        print(f'BEFORE update: {level.percent}')
         l_duration = duration_calc(level.start_date, level.end_date)
         update_level_percents(username, from_project, level.name, p_duration, l_duration)
         if level.is_done == True:
@@ -105,7 +104,8 @@ def make_str_project(project):
 def calc_new_duration(levels):
     new_duration = 0
     for level in levels:
-        new_duration += level.duration
+        if not level.is_done:
+            new_duration += level.duration
     return new_duration
 
 
