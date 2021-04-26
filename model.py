@@ -46,8 +46,37 @@ class Levels(Base):
     owner = Column(String) #
     is_done = Column(Boolean) #
     color = Column(String) #
+    first_alert = Column(Boolean)
+    second_alert = Column(Boolean)
+    third_alert = Column(Boolean)
+
     
 class Subjects(Base):
     __tablename__ = 'subjects'
     id = Column(Integer, primary_key = True)
     name = Column(String)
+
+
+class Chats(Base):
+    __tablename__ = 'chats'
+    id = Column(Integer, primary_key = True)
+    title = Column(String)
+    content = Column(String)
+    user = Column(String)
+    date = Column(String)
+    hour = Column(String)
+    subject = Column(String)
+    num_messages = Column(Integer)
+
+
+class Messages(Base):
+    __tablename__ = 'replies'
+    id = Column(Integer, primary_key = True)
+    content = Column(String)
+    user = Column(String)
+    date = Column(String)
+    hour = Column(String)
+    subject = Column(String)
+    from_chat = Column(String)
+    chat_id = Column(Integer)
+    

@@ -11,8 +11,6 @@ var isAfterStartDate = function(startDateStr, endDateStr) {
 var isSameName = function(newProjectName) {
     var allNames = document.getElementsByName("names");
     for(var i = 0; i < allNames.length; i++){
-        alert(allNames[i].value);
-        alert(allNames[i].value == newProjectName);
         if(allNames[i].value == newProjectName) {
             return false;
         }

@@ -130,15 +130,67 @@ def project_submission_alert(user):
         elif duration_calc(today, end_date) < 0:
             alerts_dict[project.name] = 3
     return alerts_dict
-# def level_submission_alert():
-#     users = return_all_users()
-#     if not users:
-#         return
-#     for user in users:
-#         user_projects = return_user_projects(user.username)
-#         for project in user_projects:
-#             levels = return_project_levels(user.username, project.name)
-#             due_level = return_closest_due(levels)
-            
-        
+
+def level_submission_alert(user, levels):
+    alerts_dict = {}
+    today = datetime.today().strftime("%Y-%m-%d")
+
+    for level in levels:
+        end_date = format_date(level.end_date)
+        if duration_calc(today, end_date) == 1:
+            alerts_dict[level.name] = 1
+        elif duration_calc(today, end_date) == 0:
+            alerts_dict[level.name] = 2
+        elif duration_calc(today, end_date) < 0:
+            alerts_dict[level.name] = 3
+    return alerts_dict
+
+def update_proj_color(username):
+    projects = return_user_projects(username)
+    today = datetime.today().strftime("%Y-%m-%d")
+    for project in projects:
+        if project.percents_ready != 100:
+            end_date = format_date(project.end_date)
+            if duration_calc(today, end_date) == 1 or duration_calc(today, end_date) == 0:
+                color = "rgb(250, 78, 10)" #orange
+            elif duration_calc(today, end_date) < 0:
+                color = "rgb(223, 2, 2)" #red
+            else:
+                color = "rgb(26, 168, 8)" #green
+            update_p_color(username, project.name, color)
+
+
+def update_level_color(username, project):
+    levels = return_project_levels(username, project)
+    today = datetime.today().strftime("%Y-%m-%d")
+    for level in levels:
+        end_date = format_date(level.end_date)
+        if not level.is_done:
+            if duration_calc(today, end_date) == 1 or duration_calc(today, end_date) == 0:
+                color = "rgb(250, 78, 10)" #orange
+            elif duration_calc(today, end_date) < 0:
+                color = "rgb(223, 2, 2)" #red
+            else:
+                color = "rgb(26, 168, 8)" #green
+            update_l_color(username, level.from_project, level.name, color)
+
+
+def get_user_subjects(username):
+    user_projects = return_user_projects(username)
+    user_subjects = []
+    for project in user_projects:
+        user_subjects.append(project.subject)
+    return user_subjects
+
+
+def find_relevant_recipients(sender, subject):
+    # Gets a subject and finds all the members of the forum.
+    all_users_list = return_all_users()
+    relevant_recipients = []
+    for user in all_users_list:
+        user_projects = return_user_projects(user.username)
+        for project in user_projects:
+            if project.subject == subject and user.username != sender:
+                relevant_recipients.append(user)
+    return relevant_recipients
         

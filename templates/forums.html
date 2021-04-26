@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="../static/css/responsive.css">
     <link rel="stylesheet" href="../static/projects.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href = "../static/forum.css">
 </head>
 
 <body dir="rtl">
@@ -81,140 +82,88 @@
         </div>
     </header>
     <!-- header-end -->
-
     <!-- bradcam_area_start -->
     <div class="bradcam_area breadcam_bg overlay2">
-        <h3>כל הפרוייקטים</h3>
+        <h3>פורומים פתוחים עבורך</h3>
     </div>
     <!-- bradcam_area_end -->
-
-    
-    <a href="{{url_for('new_project')}}"><div style="font-size:350%" class="fa" id="plus">&#xf067;</div></a>
-
-
-    <!-- our_courses_start -->
-    <div class="our_courses">
-        <div class="container">
+    <div class="courses_details_info">
+        <div class="container" dir="rtl">
             <div class="row">
-                <div class="col-xl-12">
-                    <div class="section_title text-center mb-100">
-                        <h3>פרוייקטים פעילים</h3>
-                        <p>עברו על פרוייקט עם העכבר <br>
-                            כדי לצפות בפרטים נוספים.
-                        </p>
+                <div class="col-xl-12 col-lg-12">
+                    <div class="single_courses">
+                    <center>
+                        <h3 class="second_title">הרשימה המלאה</h3>
+                    </center>
+                    </div>
+                    <div class="outline_courses_info">
+                            <div id="accordion" >
+                                <center>
+                                    {% for subject in open_chats %}
+                                    <div class="card">
+                                        <div class="card-header" id="heading{{subject[1]}} ">
+                                            <h5 class="mb-0">
+                                                
+                                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse{{subject[1]}}" aria-expanded="false" aria-controls="collapse{{subject[1]}}">
+                                                    <i class="flaticon-question"></i> {{ subject[0] }}                                               </button>
+                                            </h5>
+                                        </div>
+                                        <div id="collapse{{subject[1]}}" class="collapse" aria-labelledby="heading{{subject[1]}}" data-parent="#accordion">
+                                            <div class="card-body">
+                                               <div class="row">
+                                                   {% for chat in open_chats[subject] %}
+                                                   
+                                                    <div class="col-xl-4 col-lg-4">
+                                                        <form action="/single_forum_temp" method="POST">
+                                                            <input type="hidden" name="chat_id" value="{{ chat.id }}">
+                                                            <button type="submit" class="btn-hover color-10" id="submit"
+                                                            style="height:100%;"> {{chat.title }}</button>
+                                                        </form>
+                                                    </div>
+                                                    {% endfor %}
+                                               </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </center>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                {% for key in user_projects %}
-                {% if key.percents_ready != 100 %}
-                <div class="col-xl-3 col-md-6 col-lg-6">
-                    <div class="flip-card">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <div id="dotColor">
-                                    <style>
-                                        #dotColor{
-                                            width: 15%;
-                                            height: 15%;
-                                            position:relative;
-                                            top:5%;
-                                            right: 2%;
-                                            border-radius: 50%;
-                                            background-color: {{ key.color}};
-                                        }
-                                   </style>
-                                </div>           
-                                <h3 style= "display: inline;position:absolute;top:5%;left: 4%">{{ key.percents_ready }}%</h3>
-                                <h2 style="position:relative;top:10%;">{{ key.name }}</h2>
-                                <h3 style="position:relative;top:13%;"> מקצוע: {{ key.subject }}</h3>
-                                <h4 style="position:relative;top:20%;"> הגשה: {{ key.end_date }}</h4>
-                            </div>
-                            <div class="flip-card-back">
-                                <h7>{{ key.description}}</h7>
-                                <br>
-                                <br>
-                                <h8>{{ user_projects[key].end_date }} : {{ user_projects[key].name }}</h8>
-                                <form method="POST" action="/projects">
-                                    <input type="hidden" name="project_name" 
-                                    value = '{{ key.name }}' >
-                                    <button type="submit" class="btn-hover color-10">צפייה</button>
-                                </form>
-                            </div>
-                        </div>
+        </div>
+    </div>
+</div>
+
+    <div class="row" id="questionForm" style="position: sticky; bottom: 5%; width:100% ;">
+        <div class="col-lg-6">
+            <form action="/forums" method="POST">
+                <div class="form-group">
+                    <div class="input-group mb-3">
+                        <textarea required type="text" class="form-control" name="content" placeholder="שאל/י שאלה" rows="2"></textarea>
                     </div>
                 </div>
-                {% endif %}
+        </div>
+        <div class="col-lg-2">
+            <div class="form-group">
+                <div class="input-group mb-3">
+                    <input required type="text" class="form-control" name="title" placeholder="כותרת ">
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2">
+            <select name="forum_q_subject" style="width: 100%; height: 80%;" required>
+                <option value="">מקצוע</option>
+                {% for subject in open_chats %}
+                <option value="{{ subject[0] }}">{{ subject[0] }}</option>
                 {% endfor %}
-            </div>
+            </select>
         </div>
-    </div>
-    <br> <br>
-
-    <!-- our_courses_end -->
-
-    <!-- our_courses_start -->
-    <div class="our_courses">
-        <div class="container">
-            <div class="row">
-                <div class="col-xl-12">
-                    <div class="section_title text-center mb-100">
-                        <h3>פרוייקטים שהוגשו</h3>
-                        <p>עברו על פרוייקט עם העכבר <br>
-                            כדי לצפות בפרטים נוספים.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                {% for key in user_projects %}
-                {% if key.percents_ready == 100 %}
-                <div class="col-xl-3 col-md-6 col-lg-6">
-                    <div class="flip-card">
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <div class="dotColor" style="background-color: {{ key.color}};">
-                                    <style>
-                                       .dotColor{
-                                            width: 15%;
-                                            height: 15%;
-                                            position:relative;
-                                            top:5%;
-                                            right: 2%;
-                                            border-radius: 50%;
-                                           
-                                        }
-                                   </style>
-                                </div>           
-                                <h3 style= "display: inline;position:absolute;top:5%;left: 4%">{{ key.percents_ready }}%</h3>
-                                <h2 style="position:relative;top:10%;">{{ key.name }}</h2>
-                                <h3 style="position:relative;top:13%;"> מקצוע: {{ key.subject }}</h3>
-                                <h4 style="position:relative;top:20%;"> הגשה: {{ key.end_date }}</h4>
-                            </div>
-                            <div class="flip-card-back">
-                                <h7>{{ key.description}}</h7>
-                                <br>
-                                <br>
-                                <h8>{{ user_projects[key].end_date }} : {{ user_projects[key].name }}</h8>
-                                <form method="POST" action="/projects">
-                                    <input type="hidden" name="project_name" 
-                                    value = '{{ key.name }}' >
-                                    <button type="submit" class="btn-hover color-10">צפייה</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-                {% endfor %}
-            </div>
+        <div class="col-lg-2">
+            <button class="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn" type="submit">שליחה</button>
         </div>
+        </form>
     </div>
-            </div>
-        </div>
-    </div>
-    <!-- our_courses_end -->
-
+   
 
     <!-- footer -->
     <footer class="footer footer_bg_1">

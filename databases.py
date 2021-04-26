@@ -1,4 +1,4 @@
-from model import Base, Users, Projects, Levels, Subjects
+from model import Base, Users, Projects, Levels, Subjects, Chats, Messages
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -92,6 +92,12 @@ def update_percents(owner, name, percents):
     project.percents_ready = percents
     session.commit()
 
+def update_p_color(owner, name, color):
+    session = DBSession()
+    project = session.query(Projects).filter_by(owner = owner, name = name).first()
+    project.color = color
+    session.commit()
+
 
 def edit_project(username, name, new_name, s_date, e_date, subject, descrip):
     session = DBSession()
@@ -146,7 +152,10 @@ def add_level(name, level_num, start_date, end_date, duration, description, from
     from_project = from_project,
     owner = owner,
     is_done = False,
-    color = color)
+    color = color,
+    first_alert = False,
+    second_alert = False,
+    third_alert = False)
     session.add(level_object)
     session.commit()
 
@@ -172,6 +181,13 @@ def update_level_percents(owner, from_project, name, project_duration, new_durat
     session.commit()
 
 
+def update_l_color(owner, from_project, name, color):
+    session = DBSession()
+    level = session.query(Levels).filter_by(owner = owner, from_project = from_project, name = name).first()
+    level.color = color
+    session.commit()
+
+
 def update_from_proj(username, prev_name, new_name):
     levels_list = session.query(Levels).filter_by(owner = username, from_project = prev_name ).all()
     if new_name:
@@ -179,6 +195,16 @@ def update_from_proj(username, prev_name, new_name):
             level.from_project = new_name
         session.commit()
 
+def update_level_alert_status(owner, name, from_project, alert_num):
+    session = DBSession()
+    project_object = session.query(Levels).filter_by(owner = owner, name = name, from_project = from_project).first()
+    if alert_num == 1:
+        project_object.first_alert = True
+    elif alert_num == 2:
+        project_object.second_alert = True
+    elif alert_num == 3:
+        project_object.third_alert = True
+    session.commit()
 
 def edit_level(owner, from_project, name, new_name, is_done, s_date, e_date, descrip):
     session = DBSession()
@@ -219,4 +245,60 @@ def return_subjects():
     session = DBSession()
     subjects = session.query(Subjects).all()
     return subjects
+#############################################################################################################
 
+def open_new_chat(title, content, user, date, hour, subject):
+    session = DBSession()
+    chat_object = Chats(
+        title = title,
+        content = content,
+        user = user,
+        date = date,
+        hour = hour,
+        subject = subject,
+        num_messages = 0)
+    session.add(chat_object)
+    session.commit()
+
+heading_counter = 1
+def return_chats_dict(subjects_list):
+    global heading_counter
+    session = DBSession()
+    chats_dict = {}
+    for subject in subjects_list:
+        subjects_key = (subject, heading_counter)
+        chats_dict[subjects_key] = session.query(Chats).filter_by(subject = subject).all()
+        heading_counter += 1
+    return chats_dict
+
+
+def return_chat(chat_id):
+    session = DBSession()
+    chat = session.query(Chats).filter_by(id = chat_id).first()
+    return chat
+
+
+def return_chat_messages(from_chat, subject, chat_id):
+    session = DBSession()
+    message_list = session.query(Messages).filter_by(chat_id = chat_id, from_chat = from_chat, subject = subject).all()
+    return message_list
+
+
+def update_num_messages(id):
+    session = DBSession()
+    chat = session.query(Chats).filter_by(id = id).first()
+    chat.num_messages += 1
+    session.commit()
+#############################################################################################################
+def add_message(content, user, date, hour, subject, from_chat, chat_id):
+    session = DBSession()
+    message_object = Messages(
+        content = content,
+        user = user,
+        date = date,
+        hour = hour,
+        subject = subject,
+        from_chat = from_chat,
+        chat_id = chat_id)
+    session.add(message_object)
+    session.commit()

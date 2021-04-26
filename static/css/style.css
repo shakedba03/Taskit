@@ -5497,6 +5497,7 @@ h6 {
 
 /* line 529, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_blog.scss */
 .blog_details {
+  float: right;
   padding: 30px 0 20px 10px;
   box-shadow: 0px 10px 20px 0px rgba(221, 221, 221, 0.3);
 }
@@ -5504,6 +5505,7 @@ h6 {
 @media (min-width: 768px) {
   /* line 529, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_blog.scss */
   .blog_details {
+
     padding: 60px 30px 35px 35px;
   }
 }
@@ -5540,7 +5542,7 @@ h6 {
 
 /* line 563, C:/Users/SPN Graphics/Desktop/CL September/Edu mark/207 Education/HTML/scss/_blog.scss */
 .blog-info-link li {
-  float: left;
+  float: right;
   font-size: 14px;
 }
 

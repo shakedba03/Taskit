@@ -23,6 +23,7 @@ current_user = None
 default_subjects = ["אנגלית", "מתמטיקה", "מדעי המחשב", "מדעי החברה", "סייבר", "ביולוגיה", "פיזיקה", "אומנות"]
 project_name = ""
 level_name = ""
+clicked_chat_id = -1
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -72,6 +73,7 @@ def signup():
 @app.route('/projects', methods=['GET', 'POST'])
 def projects():
 	global current_user
+	update_proj_color(current_user.username)
 	if request.method == 'POST':
 		# Get the project out of the DB
 		clicked_proj = request.form['project_name']
@@ -150,6 +152,7 @@ def new_project():
 @app.route('/current_proj/<project_name>', methods=['GET', 'POST'])
 def current_proj(project_name):
 	global current_user
+	update_level_color(current_user.username, project_name)
 	project_object = return_project(current_user.username, project_name)
 	project_levels = return_project_levels(current_user.username, project_object.name)
 	due_date = "-"
@@ -270,8 +273,67 @@ def del_level():
 	update_project_duration(current_user.username, project_name, new_proj_duration)	
 	return redirect('/projects')
 
-def check_time():
+
+@app.route('/forums', methods=['GET', 'POST'])
+def forums():
+	global current_user
+	if request.method == 'POST':
+		title = request.form["title"]
+		content = request.form["content"]
+		subject = request.form["forum_q_subject"]
+		date = datetime.today().strftime("%Y-%m-%d")
+		hour = str(datetime.today().hour) + ":" + str(datetime.today().minute)
+		# Adding a new chat to a forum
+		open_new_chat(title, content, current_user.username, date, hour, subject)
+		# Notifying all members about the new question.
+		forum_members = find_relevant_recipients(current_user.username, subject)
+		for user in forum_members:
+			sub_line = "התקבלה שאלה חדשה בפורום: " + subject
+			msg = Message(sub_line, sender = 'taskitMail@gmail.com', recipients = [user.email])
+			msg.html = "<h1 dir='rtl'>" + user.username + ",</h1> <h3 dir='rtl'> למישהו יש שאלה בפורום! תוכן השאלה: " + content + "</h3>"
+			with app.app_context():
+				mail.send(msg)
+	open_subjects = get_user_subjects(current_user.username)
+	open_chats = return_chats_dict(open_subjects) 
+	return render_template("forums.html", open_chats = open_chats)
+
+
+@app.route('/single_forum_temp', methods=['POST'])
+def single_forum_temp():
+	global clicked_chat_id
+	clicked_chat_id = request.form["chat_id"]
+	return redirect('/single_forum')
+
+
+@app.route('/single_forum', methods=['GET','POST'])
+def single_forum():
+	global current_user, clicked_chat_id
+	chat = return_chat(int(clicked_chat_id))
+	if request.method == 'POST':
+		content = request.form["reply"]
+		date = datetime.today().strftime("%Y-%m-%d")
+		hour = str(datetime.today().hour) + ":" + str(datetime.today().minute)
+		# Adding the new reply to the DB
+		add_message(content, current_user.username, date, hour, chat.subject, chat.title, chat.id)
+		# Updating the num_messages by 1
+		if current_user.username != chat.user:
+			update_num_messages(chat.id)
+		# Notifying the user who asked the question about a new reply
+		if chat.num_messages < 3 and current_user.username != chat.user:
+			sub_line = "התקבלה תשובה חדשה בפורום: " + chat.subject
+			msg = Message(sub_line, sender = 'taskitMail@gmail.com', recipients = [current_user.email])
+			msg.html = "<h3 dir='rtl'> תוכן התשובה: " + content + "</h3>"
+			with app.app_context():
+				mail.send(msg)
+	messages = return_chat_messages(chat.title, chat.subject, chat.id)
+	return render_template("single_forum.html", chat = chat, messages = messages)  
+
+
+
+
+def nontification_center():
 	users = return_all_users()
+	print("projects###########################")
 	for user in users:
 		user_alerts = project_submission_alert(user)
 		if len(user_alerts.keys()) > 0:
@@ -279,28 +341,54 @@ def check_time():
 				project_object = return_project(user.username, project)
 				if not project_object.first_alert and user_alerts[project] == 1: 
 					msg = Message("תאריך הגשה של פרוייקט מתקרב", sender = 'taskitMail@gmail.com', recipients = [user.email])
-					msg.html = "<h1>" + user.username + ",</h1> <h3> תאריך ההגשה של הפרוייקט: " + project + " הוא מחר! " + "</h3>"
+					msg.html = "<h1 dir='rtl'>" + user.username + ",</h1> <h3 dir='rtl'> תאריך ההגשה של הפרוייקט: " + project + " הוא מחר! " + "</h3>"
 					with app.app_context():
 						mail.send(msg)
 					update_alert_status(user.username, project_object.name, 1)
 				elif not project_object.second_alert and user_alerts[project] == 2: 
 					msg = Message("תאריך הגשה של פרוייקט", sender = 'taskitMail@gmail.com', recipients = [user.email])
-					msg.html = "<h1>" + user.username + ",</h1> <h3> תאריך ההגשה של הפרוייקט: " + project + "הוא היום!" + "</h3>"
+					msg.html = "<h1 dir='rtl'>" + user.username + ",</h1> <h3 dir='rtl'> תאריך ההגשה של הפרוייקט: " + project + "הוא היום!" + "</h3>"
 					with app.app_context():
 						mail.send(msg)
 					update_alert_status(user.username, project_object.name, 2)
 				elif not project_object.third_alert and user_alerts[project] == 3: 
 					msg = Message("תאריך הגשה של פרוייקט חלף...", sender = 'taskitMail@gmail.com', recipients = [user.email])
-					msg.html = "<h1>" + user.username + ",</h1> <h3> תאריך ההגשה של הפרוייקט: " + project + "היה אתמול והפרוייקט לא הוגש." + "</h3>"
+					msg.html = "<h1 dir='rtl'>" + user.username + ",</h1> <h3 dir='rtl'> תאריך ההגשה של הפרוייקט: " + project + " היה אתמול והפרוייקט לא הוגש." + "</h3>"
 					with app.app_context():
 						mail.send(msg)	
-					update_alert_status(user.username, project_object.name, 3)			
-	threading.Timer(60.0, check_time).start()
+					update_alert_status(user.username, project_object.name, 3)	
+				print("levels levels levels!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+				# levels nontifications.
+				levels = return_project_levels(user.username, project.name)	
+				levels_alerts = level_submission_alert(user, levels)
+				if len(levels_alerts.keys()) > 0:
+					for level in levels_alerts:
+						level_object = return_level(user.username, level, project.name)
+						if not level_object.first_alert and levels_alerts[level] == 1: 
+							msg = Message("תאריך הגשה של שלב מתקרב", sender = 'taskitMail@gmail.com', recipients = [user.email])
+							msg.html = "<h1 dir='rtl'>" + user.username + ",</h1> <h3 dir='rtl'> תאריך ההגשה של השלב: " + level + " הוא מחר! " + "</h3>"
+							with app.app_context():
+								mail.send(msg)
+							update_level_alert_status(user.username, level_object.name, project.name, 1)
+						elif not level_object.second_alert and levels_alerts[level] == 2: 
+							msg = Message("תאריך הגשה של שלב", sender = 'taskitMail@gmail.com', recipients = [user.email])
+							msg.html = "<h1 dir='rtl'>" + user.username + ",</h1> <h3 dir='rtl'> תאריך ההגשה של השלב: " + level + "הוא היום!" + "</h3>"
+							with app.app_context():
+								mail.send(msg)
+							update_level_alert_status(user.username, level_object.name, project.name, 2)
+						elif not level_object.third_alert and levels_alerts[level] == 3: 
+							msg = Message("תאריך הגשה של שלב חלף...", sender = 'taskitMail@gmail.com', recipients = [user.email])
+							msg.html = "<h1 dir='rtl'>" + user.username + ",</h1> <h3 dir='rtl'> תאריך ההגשה של הפרוייקט: " + level + " היה אתמול והשלב לא הוגש." + "</h3>"
+							with app.app_context():
+								mail.send(msg)	
+							update_level_alert_status(user.username, level_object.name, project.name, 3)	
+
+	threading.Timer(60.0, nontification_center).start()
 	
 
 
 if __name__ == '__main__':
 # check date, send messages?
-	check_time()
-	app.run(debug = False)
+	nontification_center()
+	app.run(debug = True)
 	#, ssl_context = "adhoc"
