@@ -28,7 +28,7 @@ clicked_chat_id = -1
 @app.route('/', methods=['GET', 'POST'])
 def index():
 	global current_user, user_projects, default_subjects
-	
+	nontification_center()
 	if request.method == 'POST':
 		username = request.form['username']
 		password = request.form['password']
@@ -336,7 +336,7 @@ def single_forum():
 
 def nontification_center():
 	users = return_all_users()
-	print("projects###########################")
+	
 	for user in users:
 		user_alerts = project_submission_alert(user)
 		if len(user_alerts.keys()) > 0:
@@ -360,31 +360,31 @@ def nontification_center():
 					with app.app_context():
 						mail.send(msg)	
 					update_alert_status(user.username, project_object.name, 3)	
-				print("levels levels levels!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+				
 				# levels nontifications.
-				levels = return_project_levels(user.username, project.name)	
+				levels = return_project_levels(user.username, project_object.name)	
 				levels_alerts = level_submission_alert(user, levels)
 				if len(levels_alerts.keys()) > 0:
 					for level in levels_alerts:
-						level_object = return_level(user.username, level, project.name)
+						level_object = return_level(user.username, level, project_object.name)
 						if not level_object.first_alert and levels_alerts[level] == 1: 
 							msg = Message("תאריך הגשה של שלב מתקרב", sender = 'taskitMail@gmail.com', recipients = [user.email])
 							msg.html = "<h1 dir='rtl'>" + user.username + ",</h1> <h3 dir='rtl'> תאריך ההגשה של השלב: " + level + " הוא מחר! " + "</h3>"
 							with app.app_context():
 								mail.send(msg)
-							update_level_alert_status(user.username, level_object.name, project.name, 1)
+							update_level_alert_status(user.username, level_object.name, project_object.name, 1)
 						elif not level_object.second_alert and levels_alerts[level] == 2: 
 							msg = Message("תאריך הגשה של שלב", sender = 'taskitMail@gmail.com', recipients = [user.email])
 							msg.html = "<h1 dir='rtl'>" + user.username + ",</h1> <h3 dir='rtl'> תאריך ההגשה של השלב: " + level + "הוא היום!" + "</h3>"
 							with app.app_context():
 								mail.send(msg)
-							update_level_alert_status(user.username, level_object.name, project.name, 2)
+							update_level_alert_status(user.username, level_object.name, project_object.name, 2)
 						elif not level_object.third_alert and levels_alerts[level] == 3: 
 							msg = Message("תאריך הגשה של שלב חלף...", sender = 'taskitMail@gmail.com', recipients = [user.email])
 							msg.html = "<h1 dir='rtl'>" + user.username + ",</h1> <h3 dir='rtl'> תאריך ההגשה של הפרוייקט: " + level + " היה אתמול והשלב לא הוגש." + "</h3>"
 							with app.app_context():
 								mail.send(msg)	
-							update_level_alert_status(user.username, level_object.name, project.name, 3)	
+							update_level_alert_status(user.username, level_object.name, project_object.name, 3)	
 
 	threading.Timer(60.0, nontification_center).start()
 	
@@ -392,6 +392,5 @@ def nontification_center():
 
 if __name__ == '__main__':
 # check date, send messages?
-	nontification_center()
 	app.run(debug = True)
 	#, ssl_context = "adhoc"

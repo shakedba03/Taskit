@@ -122,13 +122,14 @@ def project_submission_alert(user):
 
     user_projects = return_user_projects(user.username)
     for project in user_projects:
-        end_date = format_date(project.end_date)
-        if duration_calc(today, end_date) == 1:
-            alerts_dict[project.name] = 1
-        elif duration_calc(today, end_date) == 0:
-            alerts_dict[project.name] = 2
-        elif duration_calc(today, end_date) < 0:
-            alerts_dict[project.name] = 3
+        if project.percents_ready < 100:
+            end_date = format_date(project.end_date)
+            if duration_calc(today, end_date) == 1:
+                alerts_dict[project.name] = 1
+            elif duration_calc(today, end_date) == 0:
+                alerts_dict[project.name] = 2
+            elif duration_calc(today, end_date) < 0:
+                alerts_dict[project.name] = 3
     return alerts_dict
 
 def level_submission_alert(user, levels):
@@ -136,13 +137,14 @@ def level_submission_alert(user, levels):
     today = datetime.today().strftime("%Y-%m-%d")
 
     for level in levels:
-        end_date = format_date(level.end_date)
-        if duration_calc(today, end_date) == 1:
-            alerts_dict[level.name] = 1
-        elif duration_calc(today, end_date) == 0:
-            alerts_dict[level.name] = 2
-        elif duration_calc(today, end_date) < 0:
-            alerts_dict[level.name] = 3
+        if not level.is_done:
+            end_date = format_date(level.end_date)
+            if duration_calc(today, end_date) == 1:
+                alerts_dict[level.name] = 1
+            elif duration_calc(today, end_date) == 0:
+                alerts_dict[level.name] = 2
+            elif duration_calc(today, end_date) < 0:
+                alerts_dict[level.name] = 3
     return alerts_dict
 
 def update_proj_color(username):

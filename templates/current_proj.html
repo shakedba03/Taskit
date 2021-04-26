@@ -181,7 +181,7 @@
                                 <h4 style="position:relative;top:20%;"> הגשה: {{ level.end_date }}</h4>
                             </div>
                             <div class="flip-card-back">
-                                <h7>{{ level.description}}</h7>
+                                <p>{{ level.description}}</p>
                                 <br>
                                 <br>
                                 <form method="POST" action="/temp_edit_level">
@@ -223,16 +223,16 @@
                     <div class="flip-card">
                         <div class="flip-card-inner">
                             <div class="flip-card-front">
-                                <div id="dotColor">
+                                <div class="dotColor" style="background-color: {{ level.color}};">
                                     <style>
-                                        #dotColor{
+                                        .dotColor{
                                             width: 15%;
                                             height: 15%;
                                             position:relative;
                                             top:5%;
                                             right: 2%;
                                             border-radius: 50%;
-                                            background-color: {{ level.color}};
+                                            
                                         }
                                    </style>
                                 </div>           
@@ -240,7 +240,7 @@
                                 <h4 style="position:relative;top:20%;"> הגשה: {{ level.end_date }}</h4>
                             </div>
                             <div class="flip-card-back">
-                                <h7>{{ level.description}}</h7>
+                                <p>{{ level.description}}</p>
                                 <br>
                                 <br>
                                 <form method="POST" action="/temp_edit_level">
