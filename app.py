@@ -29,6 +29,7 @@ clicked_chat_id = -1
 def index():
 	global current_user, user_projects, default_subjects
 	nontification_center()
+	msg = ""
 	if request.method == 'POST':
 		username = request.form['username']
 		password = request.form['password']
@@ -46,7 +47,8 @@ def index():
 				# print(current_user.username) ---> DELETE IT
 				# print("after login: TOTAL PROJECTS NUM is " + str(current_user.total_porject_num)) ---> DELETE IT
 				return redirect('/projects')
-	return render_template("index.html")
+		msg = "פרטי הכניסה שגויים"
+	return render_template("login.html", msg = msg)
 	
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -60,14 +62,13 @@ def signup():
 
 		for user in users_list:
 			if user.username == username:
-				# if the emails are the same - what happens? can someone have 2 users?---> DELETE IT
 				msg = "שם המשתמש שהוזן כבר קיים במערכת. אנא בחרו שם משתמש אחר!"
 
 		if password != password2:
 			msg = "אימות הסיסמה אינו תואם לסיסמה שהוזנה."
 		if msg == "":
 			add_user(username, password, email)
-			return render_template("index.html")
+			return render_template("login.html")
 	return render_template("signup.html", msg = msg)
 
 @app.route('/projects', methods=['GET', 'POST'])

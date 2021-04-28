@@ -21,40 +21,10 @@
   </head>
   <body >
     <script>
-    function verify(){
-        var username = document.getElementsByName("username")[0];
-        var password = document.getElementsByName("password")[0];
-        var password2 = document.getElementsByName("password2")[0];
-        
-        var isValid1 = true;
-        var isValid2 = true;
-        var isValid3 = true;
-        if (username.length > 10){
-            alert("שם המשתמש חייב להיות עד שמונה תווים בלבד.");
-            isValid1 = false;
-        }
-        if (password.value != password2.value){
-            alert("אימות הסיסמה לא תואם לסיסמה שהוזנה.");
-            isValid2 = false;
-        }
-        var password = document.getElementsByName("password")[0].value;
-        if (password.length < 10){
-            alert("אורך הסיסמה חייב להיות עשרה תווים לפחות.");
-            isValid3 = false;;
-        }
-        if (isValid1 && isValid2 && isValid3){
-            encrypt_data()
-        }
-        
-        return isValid1 && isValid2 && isValid3;
-    }
       function encrypt_data(){
         var password = document.getElementsByName("password")[0];
         var hashed = md5(password.value);
         password.value = hashed;
-        var password2 = document.getElementsByName("password2")[0];
-        var hashed2 = md5(password2.value);
-        password2.value = hashed2;
       }
     </script>
     <div class="content" style="position: absolute; top: 15%; left: 10%;">
@@ -68,9 +38,9 @@
               <div class="col-md-8">
                 <div class="mb-4">
                 <h1>TaskIt</h1>
-                <h5 class="mb-4" style="position: absolute; right: 5%;" dir="rtl">רוצים לתכנן את הזמן טוב יותר?</h5><br>
+                <h3 class="mb-4" style="position: absolute; right: 5%;" dir="rtl">ברוכים השבים. </h3><br>
               </div>
-              <form action="/signup" method="POST" onsubmit="return verify();">
+              <form action="/" method="POST" onsubmit="encrypt_data()">
                 <div class="form-group first">
                   <label for="username" style="position: absolute; right: 5%;">שם משתמש</label>
                   <input type="text" class="form-control" name="username" id="username">    
@@ -81,18 +51,11 @@
                   <input type="password" class="form-control" name ="password" id="password">
                   
                 </div>
-
-                <div class="form-group last mb-4">
-                    <label for="password2" style="position: absolute; right: 5%;">אימות סיסמה</label>
-                    <input type="password" class="form-control" name ="password2" id="password2">
-                    
-                </div>
                 
-                <div class="form-group last mb-4">
-                    <label for="email" style="position: absolute; right: 5%;">אימייל</label>
-                    <input type="email" class="form-control" name ="email" id="email">
-                    
+                <div class="d-flex mb-5 align-items-center">
+                  <span class="ml-auto"><a href="{{url_for('signup')}}" class="forgot-pass">עוד לא נרשמתם? הירשמו כאן</a></span> 
                 </div>
+
                 <input type="submit" value="כניסה" class="btn btn-block btn-primary">
 
                 <h3 class="d-block text-left my-4 text-muted" style="color: red;">&mdash; {{ msg }} &mdash;</h3>
