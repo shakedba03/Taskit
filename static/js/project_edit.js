@@ -32,9 +32,6 @@ var isValidEditEnd = function (pEnd) {
         eDate = new Date(data[2]);
         pEnd = new Date(pEnd);
         isDone = data[1];
-        alert(eDate);
-        alert(pEnd);
-        alert(eDate > pEnd && isDone == "False");
         if (eDate > pEnd && isDone == "False") {
             return false;
         }
@@ -46,8 +43,6 @@ var isValidEditEnd = function (pEnd) {
 var isSameName = function (newProjectName) {
     var allNames = document.getElementsByName("names");
     for (var i = 0; i < allNames.length; i++) {
-        alert(allNames[i].value);
-        alert(allNames[i].value == newProjectName);
         if (allNames[i].value == newProjectName) {
             return false;
         }
@@ -159,7 +154,7 @@ $(document).ready(function () {
                                 $('.modal').modal('hide');
                                 $('#success').modal('show');
                                 alert("העדכון הושלם.")
-                                // window.location.href ='/project_edit';
+                                window.location.href ='/projects';
                             })
                         },
                         error: function () {

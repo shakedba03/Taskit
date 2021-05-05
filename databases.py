@@ -1,8 +1,7 @@
 from model import Base, Users, Projects, Levels, Subjects, Chats, Messages
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
-
+from datetime import date
 
 engine = create_engine('sqlite:///database.db', connect_args={'check_same_thread': False})
 Base.metadata.create_all(engine)
@@ -17,14 +16,15 @@ def add_user(username, password, email):
     password = password,
     email = email,
     active_projects = 0,
-    total_porject_num = 0)
+    total_porject_num = 0,
+    is_blocked = False)
     session.add(user_object)
     session.commit()
 
 
-def delete_user(username):
+def delete_user_from_db(id):
     session = DBSession()
-    session.query(Users).filter_by(username = username).delete()
+    session.query(Users).filter_by(id = id).delete()
     session.commit()
 
 
@@ -40,12 +40,48 @@ def return_user(username):
     return user
 
 
+def return_user_by_id(id):
+    session = DBSession()
+    user = session.query(Users).filter_by(id = id).first()
+    return user
+
+
 def update_active_proj_num(username):
     session = DBSession()
     user_object = session.query(Users).filter_by(username = username).first()
     user_object.active_projects += 1
     user_object.total_porject_num += 1
     session.commit()
+
+
+def reduce_active_projects(username):
+    session = DBSession()
+    user_object = session.query(Users).filter_by(username = username).first()
+    user_object.active_projects -= 1
+    print("done!!!!!!!!!!!!!!!!!!")
+    session.commit()
+
+
+def reduce_total_proj_num(username):
+    session = DBSession()
+    user_object = session.query(Users).filter_by(username = username).first()
+    user_object.total_porject_num -= 1
+    session.commit()
+
+
+def block_user_forums(id):
+    session = DBSession()
+    user_object = session.query(Users).filter_by(id = id).first()
+    user_object.is_blocked = True
+    session.commit()
+
+
+def unblock_user(id):
+    session = DBSession()
+    user_object = session.query(Users).filter_by(id = id).first()
+    user_object.is_blocked = False
+    session.commit()
+
 
 def return_emails():
     session = DBSession()
@@ -70,7 +106,8 @@ def add_project(name, subject, start_date, end_date, duration, description, owne
     percents_ready = percents_ready,
     first_alert = False,
     second_alert = False,
-    third_alert = False)
+    third_alert = False,
+    month_added = date.today().month)
     session.add(project_object)
     session.commit()
 
@@ -86,11 +123,17 @@ def return_project(owner, name):
     project = session.query(Projects).filter_by(owner = owner, name = name).first()
     return project
 
+
 def update_percents(owner, name, percents):
     session = DBSession()
     project = session.query(Projects).filter_by(owner = owner, name = name).first()
-    project.percents_ready = percents
+    if project.percents_ready + percents > 100:
+        project.percents_ready = 100
+        reduce_active_projects(owner)
+    else:
+        project.percents_ready = percents
     session.commit()
+
 
 def update_p_color(owner, name, color):
     session = DBSession()
@@ -124,7 +167,17 @@ def update_project_duration(username, p_name, new_duration):
 
 def delete_project(owner, project_name):
     session = DBSession()
+    reduce_total_proj_num(owner)
+    project = return_project(owner, project_name)
+    if project.percents_ready < 100:
+        reduce_active_projects(owner)
     session.query(Projects).filter_by(owner = owner, name = project_name).delete()
+    session.commit()
+
+
+def delete_all_projects(owner):
+    session = DBSession()
+    session.query(Projects).filter_by(owner = owner).delete()
     session.commit()
 
 
@@ -175,8 +228,7 @@ def return_level(owner, level_name, from_project):
 def update_level_percents(owner, from_project, name, project_duration, new_duration):
     session = DBSession()
     level_object = session.query(Levels).filter_by(owner = owner, from_project = from_project, name = name).first()
-    if new_duration != 0 and project_duration != 0:
-        level_object.percent = round((new_duration / project_duration) * 100)
+    level_object.percent = round((new_duration / project_duration) * 100)
     session.commit()
 
 def update_level_duration(owner, from_project, name, new_level_duration):
@@ -210,25 +262,31 @@ def update_level_alert_status(owner, name, from_project, alert_num):
         project_object.third_alert = True
     session.commit()
 
-def edit_level(owner, from_project, name, new_name, is_done, s_date, e_date, descrip):
+def edit_level(owner, from_project, name, new_name, is_done_changed , s_date, e_date, descrip):
     session = DBSession()
     level_object = session.query(Levels).filter_by(from_project = from_project, name = name, owner = owner).first()
-    if new_name:
+    if new_name != "":
         level_object.name = new_name
-    if s_date:
+    if s_date != "":
         level_object.start_date = s_date
-    if e_date:
+    if e_date != "":
         level_object.end_date = e_date
-    if descrip:
+    if descrip != "":
         level_object.description = descrip
-    if is_done != level_object.is_done:
-        level_object.is_done = is_done
+    if is_done_changed:
+        level_object.is_done = not level_object.is_done
     session.commit()
 
 
 def delete_all_levels(owner, project_name):
     session = DBSession()
     session.query(Levels).filter_by(owner = owner, from_project = project_name).delete()
+    session.commit()
+
+
+def delete_all_user_levels(owner):
+    session = DBSession()
+    session.query(Levels).filter_by(owner = owner).delete()
     session.commit()
 
 
@@ -288,21 +346,34 @@ def return_chat_messages(from_chat, subject, chat_id):
     return message_list
 
 
+def return_all_chats():
+    session = DBSession()
+    chats = session.query(Chats).all()
+    return chats
+
+
 def update_num_messages(id):
     session = DBSession()
     chat = session.query(Chats).filter_by(id = id).first()
     chat.num_messages += 1
     session.commit()
 #############################################################################################################
-def add_message(content, user, date, hour, subject, from_chat, chat_id):
+def add_message(content, user, date_input, hour, subject, from_chat, chat_id):
     session = DBSession()
     message_object = Messages(
         content = content,
         user = user,
-        date = date,
+        date = date_input,
         hour = hour,
         subject = subject,
         from_chat = from_chat,
-        chat_id = chat_id)
+        chat_id = chat_id,
+        month_added = date.today().month)
     session.add(message_object)
     session.commit()
+
+
+def return_all_messages():
+    session = DBSession()
+    messages = session.query(Messages).all()
+    return messages

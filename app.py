@@ -28,12 +28,19 @@ clicked_chat_id = -1
 @app.route('/', methods=['GET', 'POST'])
 def index():
 	global current_user, user_projects, default_subjects
-	nontification_center()
+	
+	notification_center()
+	admin = return_user("taskitAdmin")
+	if not admin:
+		add_user("taskitAdmin", "80261d757fbd1902559576f23a6c4968", "taskitmail@gmail.com")
 	msg = ""
 	if request.method == 'POST':
 		username = request.form['username']
 		password = request.form['password']
 		users_list = return_all_users()
+
+		if username == "taskitAdmin" and password == "80261d757fbd1902559576f23a6c4968":
+			return redirect("/data")
 		
 		for user in users_list:
 			if user.username == username and user.password == password:
@@ -127,14 +134,13 @@ def new_project():
 				level_num = i
 				from_p = p_name
 				level_duration = duration_calc(level_start, level_end)
-				# percent = (level_duration / p_duration) * 100
 				p_duration += level_duration
 				level_color = get_color(level_end)
 				# Adding the project's levels to the levels table.
 				add_level(level_name, level_num, level_start,
 				level_end, level_duration, level_descrip, from_p, owner, level_color)
 			except:
-				pass
+				continue
 		# adding the project to the Projects table.
 		add_project(p_name, subject, p_start_date,
 		p_end_date, p_duration, p_descrip, owner, color, percents_ready)
@@ -194,8 +200,9 @@ def project_edit():
 	# pulling all user's project from the DB into a hidden input in the html.
 	user_projects = return_user_projects(current_user.username)
 	all_projects_names = get_name_list(user_projects)	
+	subjects = return_subjects()
 	return render_template("project_edit.html", project = project_object, today = today,
-	levels_str = levels_str, all_projects_names = all_projects_names)
+	levels_str = levels_str, all_projects_names = all_projects_names, subjects = subjects)
 
 @app.route('/temp_edit_level', methods=['POST'])
 def temp_edit_level():
@@ -220,40 +227,47 @@ def level_edit():
 		end_date = request.form["end_date"]
 		descrip = request.form["message"]
 		status = request.form["status"]
-		is_done = False
-		if start_date or end_date:
+		is_done_changed = False
+		print(status)
+		level = return_level(current_user.username, level_name, project_name)
+		
+		if status != "none":
+			is_done_changed  = True
+		
+			
+		# Edit the level's info.
+		edit_level(current_user.username, project_name, level_name, 
+		name, is_done_changed , start_date, end_date, descrip)
+
+		if format_date(start_date) != format_date(level.start_date)  or format_date(end_date) != format_date(level.end_date):
 			new_duration = duration_calc(start_date, end_date)
 			update_level_duration(current_user.username, project_name, level_name, new_duration)
+
 			levels = return_project_levels(current_user.username, project_name)
 			project = return_project(current_user.username, project_name)
 			p_duration = calc_new_duration(levels)
 			update_project_duration(current_user.username, project_name, p_duration)
 			update_level_percents(current_user.username, project_name, level_name, project.duration, new_duration)
-		if status == "done":
-			is_done = True
-		
-			
-		# Edit the project info.
-		edit_level(current_user.username, project_name, level_name, 
-		name, is_done, start_date, end_date, descrip)
 		# Updating the percents of the project.
 		levels = return_project_levels(current_user.username, project_name)
 		new_percents = percents_ready(levels)
-		#print(new_percents)
 		update_percents(current_user.username, project_name, new_percents)
 		# redirect to projects.
 		return redirect('/projects')
 	level_object = return_level(current_user.username, level_name, project_name)
-	return render_template("edit_level.html", level = level_object, today = today, project_str = project_str)
+	return render_template("edit_level.html", level = level_object, today = today, project_str = project_str,
+	)
 
 @app.route('/delete_proj', methods=['GET', 'POST'])
 def delete_proj():
 	global current_user
 	# Get the delete name
 	project_name = request.form['project_name']
+	project = return_project(current_user.username, project_name)
 	delete_project(current_user.username, project_name)
 	# Delete the project's levels:
 	delete_all_levels(current_user.username, project_name)
+	
 	return redirect('/projects')
 
 @app.route('/del_level', methods=['POST'])
@@ -299,7 +313,7 @@ def forums():
 				mail.send(msg)
 	open_subjects = get_user_subjects(current_user.username)
 	open_chats = return_chats_dict(open_subjects) 
-	return render_template("forums.html", open_chats = open_chats)
+	return render_template("forums.html", open_chats = open_chats, user = current_user)
 
 
 @app.route('/single_forum_temp', methods=['POST'])
@@ -323,9 +337,10 @@ def single_forum():
 		if current_user.username != chat.user:
 			update_num_messages(chat.id)
 		# Notifying the user who asked the question about a new reply
-		if chat.num_messages < 3 and current_user.username != chat.user:
+		if chat.num_messages < 3: #make sure to check who sent it
+			user_sent = return_user(chat.user)
 			sub_line = "התקבלה תשובה חדשה בפורום: " + chat.subject
-			msg = Message(sub_line, sender = 'taskitMail@gmail.com', recipients = [current_user.email])
+			msg = Message(sub_line, sender = 'taskitMail@gmail.com', recipients = [user_sent.email])
 			msg.html = "<h3 dir='rtl'> תוכן התשובה: " + content + "</h3>"
 			with app.app_context():
 				mail.send(msg)
@@ -333,11 +348,55 @@ def single_forum():
 	return render_template("single_forum.html", chat = chat, messages = messages)  
 
 
+@app.route('/data', methods=['GET'])
+def data():
+	num_users = len(return_all_users())
+	late_num = get_late_num()
+	all_projects = total_proj_num()
+	active_projects = total_active_proj_num()
+	added = added_monthly()
+	num_chats = len(return_all_chats())
+	sent = sent_monthly()
+	num_subjects = len(return_subjects())
+	return render_template("admin_data.html", num_users = num_users, late_num = late_num,
+	all_projects = all_projects, active_projects = active_projects, added = added, num_chats = num_chats, 
+	sent = sent, num_subjects = num_subjects)
 
 
-def nontification_center():
+@app.route('/delete_user', methods=['POST'])
+def delete_user():
+	user_id = request.form["user_id"]
+	user = return_user_by_id(user_id)
+	delete_all_projects(user.username)
+	delete_all_user_levels(user.username)
+	delete_user_from_db(user_id)
+	return redirect('/users_table')
+
+
+@app.route('/block_user', methods=['POST'])
+def block_user():
+	user_id = request.form["user_id"]
+	user = return_user_by_id(user_id)
+	if user.is_blocked:
+		unblock_user(user_id)
+		return redirect('/users_table')
+	block_user_forums(user_id)
+	return redirect('/users_table')
+
+
+@app.route('/users_table', methods=['GET', 'POST'])
+def users_table():
 	users = return_all_users()
-	
+	return render_template("admin_users.html", users = users)
+
+@app.route('/admin_subjects', methods=['GET', 'POST'])
+def admin_subjects():
+	subjects = return_subjects()
+	return render_template("admin_subjects.html", subjects = subjects)
+
+
+def notification_center():
+	users = return_all_users()
 	for user in users:
 		user_alerts = project_submission_alert(user)
 		if len(user_alerts.keys()) > 0:
@@ -361,37 +420,40 @@ def nontification_center():
 					with app.app_context():
 						mail.send(msg)	
 					update_alert_status(user.username, project_object.name, 3)	
-				
-				# levels nontifications.
-				levels = return_project_levels(user.username, project_object.name)	
-				levels_alerts = level_submission_alert(user, levels)
-				if len(levels_alerts.keys()) > 0:
-					for level in levels_alerts:
-						level_object = return_level(user.username, level, project_object.name)
-						if not level_object.first_alert and levels_alerts[level] == 1: 
-							msg = Message("תאריך הגשה של שלב מתקרב", sender = 'taskitMail@gmail.com', recipients = [user.email])
-							msg.html = "<h1 dir='rtl'>" + user.username + ",</h1> <h3 dir='rtl'> תאריך ההגשה של השלב: " + level + " הוא מחר! " + "</h3>"
-							with app.app_context():
-								mail.send(msg)
-							update_level_alert_status(user.username, level_object.name, project_object.name, 1)
-						elif not level_object.second_alert and levels_alerts[level] == 2: 
-							msg = Message("תאריך הגשה של שלב", sender = 'taskitMail@gmail.com', recipients = [user.email])
-							msg.html = "<h1 dir='rtl'>" + user.username + ",</h1> <h3 dir='rtl'> תאריך ההגשה של השלב: " + level + "הוא היום!" + "</h3>"
-							with app.app_context():
-								mail.send(msg)
-							update_level_alert_status(user.username, level_object.name, project_object.name, 2)
-						elif not level_object.third_alert and levels_alerts[level] == 3: 
-							msg = Message("תאריך הגשה של שלב חלף...", sender = 'taskitMail@gmail.com', recipients = [user.email])
-							msg.html = "<h1 dir='rtl'>" + user.username + ",</h1> <h3 dir='rtl'> תאריך ההגשה של הפרוייקט: " + level + " היה אתמול והשלב לא הוגש." + "</h3>"
-							with app.app_context():
-								mail.send(msg)	
-							update_level_alert_status(user.username, level_object.name, project_object.name, 3)	
 
-	threading.Timer(60.0, nontification_center).start()
+
+		# levels nontifications.
+		user_total_projects = return_user_projects(user.username)
+		for project_object in user_total_projects:
+			levels = return_project_levels(user.username, project_object.name)	
+			levels_alerts = level_submission_alert(user, levels)
+			if len(levels_alerts.keys()) > 0:
+				for level in levels_alerts:
+					level_object = return_level(user.username, level, project_object.name)
+					if not level_object.first_alert and levels_alerts[level] == 1: 
+						msg = Message("תאריך הגשה של שלב מתקרב", sender = 'taskitMail@gmail.com', recipients = [user.email])
+						msg.html = "<h1 dir='rtl'>" + user.username + ",</h1> <h3 dir='rtl'> תאריך ההגשה של השלב: " + level + " הוא מחר! " + "</h3>"
+						with app.app_context():
+							mail.send(msg)
+						update_level_alert_status(user.username, level_object.name, project_object.name, 1)
+					elif not level_object.second_alert and levels_alerts[level] == 2: 
+						msg = Message("תאריך הגשה של שלב", sender = 'taskitMail@gmail.com', recipients = [user.email])
+						msg.html = "<h1 dir='rtl'>" + user.username + ",</h1> <h3 dir='rtl'> תאריך ההגשה של השלב: " + level + "הוא היום!" + "</h3>"
+						with app.app_context():
+							mail.send(msg)
+						update_level_alert_status(user.username, level_object.name, project_object.name, 2)
+					elif not level_object.third_alert and levels_alerts[level] == 3: 
+						msg = Message("תאריך הגשה של שלב חלף...", sender = 'taskitMail@gmail.com', recipients = [user.email])
+						msg.html = "<h1 dir='rtl'>" + user.username + ",</h1> <h3 dir='rtl'> תאריך ההגשה של הפרוייקט: " + level + " היה אתמול והשלב לא הוגש." + "</h3>"
+						with app.app_context():
+							mail.send(msg)	
+						update_level_alert_status(user.username, level_object.name, project_object.name, 3)	
+
+	threading.Timer(60.0, notification_center).start()
 	
 
 
 if __name__ == '__main__':
 # check date, send messages?
-	app.run(debug = True)
+	app.run(debug = False)
 	#, ssl_context = "adhoc"

@@ -168,7 +168,7 @@
                                 <h4 style="position:relative;top:20%;"> הגשה: {{ level.end_date }}</h4>
                             </div>
                             <div class="flip-card-back">
-                                <p>{{ level.description}}</p>
+                                <p style="word-wrap:break-word;max-width: fit-content;">{{ level.description}}</p>
                                 <br>
                                 <br>
                                 <form method="POST" action="/temp_edit_level">
@@ -227,8 +227,8 @@
                                 <h4 style="position:relative;top:20%;"> הגשה: {{ level.end_date }}</h4>
                             </div>
                             <div class="flip-card-back">
-                                <p>{{ level.description}}</p>
-                                <br>
+                                 <p style="word-wrap:break-word;max-width: fit-content;">{{ level.description}}</p>    
+                                
                                 <br>
                                 <form method="POST" action="/temp_edit_level">
                                     <input type="hidden" name="level_name" 

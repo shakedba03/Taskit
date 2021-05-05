@@ -13,6 +13,7 @@ class Users(Base):
     email = Column(String)
     active_projects = Column(Integer)
     total_porject_num = Column(Integer)
+    is_blocked = Column(Boolean)
 
 class Projects(Base):
     __tablename__ = 'projects'
@@ -30,6 +31,7 @@ class Projects(Base):
     first_alert = Column(Boolean)
     second_alert = Column(Boolean)
     third_alert = Column(Boolean)
+    month_added = Column(Integer) 
 
 
 class Levels(Base):
@@ -79,4 +81,5 @@ class Messages(Base):
     subject = Column(String)
     from_chat = Column(String)
     chat_id = Column(Integer)
+    month_added = Column(Integer) 
     

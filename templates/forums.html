@@ -73,6 +73,12 @@
     <div class="bradcam_area breadcam_bg overlay2">
         <h3>פורומים פתוחים עבורך</h3>
     </div>
+    {% if user.is_blocked %}
+        <h1>מצטערים! נראה כי נחסמת על ידי מנהל האתר.</h1>
+        <h2>לביטול החסימה אנא צרו קשר: taskitmail@gmail.com</h2>
+    {% endif %}
+
+    {% if not user.is_blocked %}
     <!-- bradcam_area_end -->
     <div class="courses_details_info">
         <div class="container" dir="rtl">
@@ -150,7 +156,7 @@
         </div>
         </form>
     </div>
-   
+    {% endif %}
 
     <!-- footer -->
     <footer class="footer footer_bg_1">

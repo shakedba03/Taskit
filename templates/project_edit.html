@@ -106,8 +106,9 @@
                                         <select class="form-control valid" name="subject" id="subject"
                                             style="height: 80%;">
                                             <option value="">{{ project.subject }}</option>
-                                            <option value="english">אנגלית</option>
-                                            <option value="math">מתמטיקה</option>
+                                            {% for subject in subjects %}
+                                            <option value="{{ subject.name }}">{{ subject.name }}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                 </div>

@@ -18,7 +18,7 @@ def duration_calc(s_date, e_date):
     start = format_date(s_date)
     end = format_date(e_date)
     duration = end - start
-    return duration.days
+    return duration.days + 1
 
 
 def verify_user_projects(username, projects_list):
@@ -119,16 +119,16 @@ def get_name_list(items):
 def project_submission_alert(user):
     alerts_dict = {}
     today = datetime.today().strftime("%Y-%m-%d")
-
+    print(today)
     user_projects = return_user_projects(user.username)
     for project in user_projects:
         if project.percents_ready < 100:
             end_date = format_date(project.end_date)
-            if duration_calc(today, end_date) == 1:
+            if duration_calc(today, end_date) == 2:
                 alerts_dict[project.name] = 1
-            elif duration_calc(today, end_date) == 0:
+            elif duration_calc(today, end_date) == 1:
                 alerts_dict[project.name] = 2
-            elif duration_calc(today, end_date) < 0:
+            elif duration_calc(today, end_date) < 1:
                 alerts_dict[project.name] = 3
     return alerts_dict
 
@@ -139,11 +139,11 @@ def level_submission_alert(user, levels):
     for level in levels:
         if not level.is_done:
             end_date = format_date(level.end_date)
-            if duration_calc(today, end_date) == 1:
+            if duration_calc(today, end_date) == 2:
                 alerts_dict[level.name] = 1
-            elif duration_calc(today, end_date) == 0:
+            elif duration_calc(today, end_date) == 1:
                 alerts_dict[level.name] = 2
-            elif duration_calc(today, end_date) < 0:
+            elif duration_calc(today, end_date) < 1:
                 alerts_dict[level.name] = 3
     return alerts_dict
 
@@ -153,7 +153,7 @@ def update_proj_color(username):
     for project in projects:
         if project.percents_ready != 100:
             end_date = format_date(project.end_date)
-            if duration_calc(today, end_date) == 1 or duration_calc(today, end_date) == 0:
+            if duration_calc(today, end_date) == 2 or duration_calc(today, end_date) == 1:
                 color = "rgb(250, 78, 10)" #orange
             elif duration_calc(today, end_date) < 0:
                 color = "rgb(223, 2, 2)" #red
@@ -168,7 +168,7 @@ def update_level_color(username, project):
     for level in levels:
         end_date = format_date(level.end_date)
         if not level.is_done:
-            if duration_calc(today, end_date) == 1 or duration_calc(today, end_date) == 0:
+            if duration_calc(today, end_date) == 2 or duration_calc(today, end_date) == 1:
                 color = "rgb(250, 78, 10)" #orange
             elif duration_calc(today, end_date) < 0:
                 color = "rgb(223, 2, 2)" #red
@@ -195,4 +195,55 @@ def find_relevant_recipients(sender, subject):
             if project.subject == subject and user.username != sender:
                 relevant_recipients.append(user)
     return relevant_recipients
-        
+
+
+def get_late_num():
+    users = return_all_users()
+    late_counter = 0
+    today = format_date(datetime.today().strftime("%Y-%m-%d"))
+    for user in users:
+        user_projects = return_user_projects(user.username)
+        for project in user_projects:
+            end_date = format_date(project.end_date)
+            if project.percents_ready < 100 and today > end_date:
+                late_counter += 1
+    return late_counter
+
+def total_proj_num():
+    users = return_all_users()
+    proj_counter = 0
+    for user in users:
+        proj_counter += user.total_porject_num
+    return proj_counter
+
+
+def total_active_proj_num():
+    users = return_all_users()
+    proj_counter = 0
+    for user in users:
+        proj_counter += user.active_projects
+    return proj_counter
+
+
+def added_monthly():
+    users = return_all_users()
+    added_counter = 0
+    today = date.today()
+    month = today.month
+    for user in users:
+        user_projects = return_user_projects(user.username)
+        for project in user_projects:
+            if project.month_added == month:
+                added_counter += 1
+    return added_counter
+
+
+def sent_monthly():
+    messages = return_all_messages()
+    sent_counter = 0
+    today = date.today()
+    month = today.month
+    for message in messages:
+        if message.month_added == month:
+            sent_counter += 1
+    return sent_counter

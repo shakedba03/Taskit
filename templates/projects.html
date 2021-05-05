@@ -118,9 +118,9 @@
                                 <h4 style="position:relative;top:20%;"> הגשה: {{ key.end_date }}</h4>
                             </div>
                             <div class="flip-card-back">
-                                <p>{{ key.description}}</p>
+                                <p style="word-wrap:break-word;max-width: fit-content;">{{ key.description}}</p>
                                 <br>
-                                <br>
+                                
                                 <p>{{ user_projects[key].end_date }} : {{ user_projects[key].name }}</p>
                                 <form method="POST" action="/projects">
                                     <input type="hidden" name="project_name" 
@@ -179,8 +179,7 @@
                                 <h4 style="position:relative;top:20%;"> הגשה: {{ key.end_date }}</h4>
                             </div>
                             <div class="flip-card-back">
-                                <p>{{ key.description}}</p>
-                                <br>
+                                <p style="word-wrap:break-word;max-width: fit-content;">{{ key.description}}</p>
                                 <br>
                                 <p>{{ user_projects[key].end_date }} : {{ user_projects[key].name }}</p>
                                 <form method="POST" action="/projects">
