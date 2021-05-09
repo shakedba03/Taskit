@@ -4,7 +4,7 @@ from databases import *
 import sys
 
 def format_date(date):
-    # Gets a str of a date.
+    # Gets a str of a date - y-m-d.
     # returns a date %d%m%Y format.
     if type(date) == str:
         str_date = date.split("-")
@@ -37,9 +37,9 @@ def get_color(end_date):
     color = "rgb(26, 168, 8)" # color = green
     today = datetime.today().strftime("%Y-%m-%d")
     days_gap = duration_calc(today, end_date)
-    if days_gap < 0:
+    if days_gap < 1:
         color = "rgb(223, 2, 2)" # color = red
-    elif days_gap <= 1:
+    elif days_gap == 2 or days_gap == 1:
         color = "rgb(250, 78, 10)" # color = orange
     return color
 
@@ -119,7 +119,6 @@ def get_name_list(items):
 def project_submission_alert(user):
     alerts_dict = {}
     today = datetime.today().strftime("%Y-%m-%d")
-    print(today)
     user_projects = return_user_projects(user.username)
     for project in user_projects:
         if project.percents_ready < 100:
@@ -131,6 +130,7 @@ def project_submission_alert(user):
             elif duration_calc(today, end_date) < 1:
                 alerts_dict[project.name] = 3
     return alerts_dict
+
 
 def level_submission_alert(user, levels):
     alerts_dict = {}
@@ -147,6 +147,7 @@ def level_submission_alert(user, levels):
                 alerts_dict[level.name] = 3
     return alerts_dict
 
+
 def update_proj_color(username):
     projects = return_user_projects(username)
     today = datetime.today().strftime("%Y-%m-%d")
@@ -155,7 +156,7 @@ def update_proj_color(username):
             end_date = format_date(project.end_date)
             if duration_calc(today, end_date) == 2 or duration_calc(today, end_date) == 1:
                 color = "rgb(250, 78, 10)" #orange
-            elif duration_calc(today, end_date) < 0:
+            elif duration_calc(today, end_date) < 1:
                 color = "rgb(223, 2, 2)" #red
             else:
                 color = "rgb(26, 168, 8)" #green
@@ -170,7 +171,7 @@ def update_level_color(username, project):
         if not level.is_done:
             if duration_calc(today, end_date) == 2 or duration_calc(today, end_date) == 1:
                 color = "rgb(250, 78, 10)" #orange
-            elif duration_calc(today, end_date) < 0:
+            elif duration_calc(today, end_date) < 1:
                 color = "rgb(223, 2, 2)" #red
             else:
                 color = "rgb(26, 168, 8)" #green
@@ -247,3 +248,12 @@ def sent_monthly():
         if message.month_added == month:
             sent_counter += 1
     return sent_counter
+
+
+# def order_chats_by_date():
+#     chats = return_all_chats()
+#     ordered_list = []
+#     max_date = format_date('2000-12-10')
+#     for chat in chats:
+#         for other_chat in chats:
+#             if format_date(chat.date) > max_date

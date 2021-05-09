@@ -139,6 +139,50 @@
           </table>
         
     </div>
+    <br><br><br>
+    <div class="row">
+        <div class="col-lg-12 posts-list">
+           <div class="single-post">
+             
+              <div class="blog_details">
+                 <h2 style="position: absolute; right: 5%;">כל השיחות
+                 </h2>
+                 <br><br>
+                 
+              </div>
+           </div>
+        </div>   
+  </div>
+
+<div class="row">
+<table class="table table-hover" dir="rtl">
+<thead>
+ <tr>
+   <th scope="col">ID</th>
+   <th scope="col">שם השיחה</th>
+   <th scope="col">תאריך</th>
+   <th scope="col">מחיקה</th>
+ </tr>
+</thead>
+<tbody>
+   {% for chat in chats %}
+ <tr>
+   <th scope="row">{{ chat.id }}</th>
+   <td>{{ chat.title }}</td>
+   <td>{{ chat.date }}</td>
+   
+   <td style="width: 10%;"><form action="/delete_chat" method="POST" onsubmit="return confirm('השיחה תימחק לצמיתות.');">
+       <input type="hidden" value="{{ chat.id }}" name="chat_id">
+       <button class="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn" type="submit">מחיקה</button>
+   </form></td>
+
+ </tr>
+ {% endfor %}
+</tbody>
+</table>
+
+</div>
+
    </section>
    <!--================ Blog Area end =================-->
 

@@ -15,6 +15,7 @@ class Users(Base):
     total_porject_num = Column(Integer)
     is_blocked = Column(Boolean)
 
+
 class Projects(Base):
     __tablename__ = 'projects'
     id = Column(Integer, primary_key = True)

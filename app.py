@@ -51,8 +51,6 @@ def index():
 				check_subjects = return_subjects()
 				if not check_subjects:
 					add_subjects(default_subjects)
-				# print(current_user.username) ---> DELETE IT
-				# print("after login: TOTAL PROJECTS NUM is " + str(current_user.total_porject_num)) ---> DELETE IT
 				return redirect('/projects')
 		msg = "פרטי הכניסה שגויים"
 	return render_template("login.html", msg = msg)
@@ -94,7 +92,6 @@ def projects():
 	current_user = return_user(current_user.username)
 	user_projects = return_user_projects(current_user.username)
 	projects_due_dict = {}
-	# print("at all projects: TOTAL PROJECTS NUM is " + str(current_user.total_porject_num)) ---> DELETE IT
 	if current_user.total_porject_num != 0:
 		# checking the percents of the project and levels.
 		user_projects = verify_user_projects(current_user.username, user_projects)
@@ -221,14 +218,12 @@ def level_edit():
 	project_str = make_str_project(project)
 	levels = return_project_levels(current_user.username, project_name)
 	if request.method == "POST":
-		print(level_name)
 		name = request.form["name"]
 		start_date = request.form["start_date"]
 		end_date = request.form["end_date"]
 		descrip = request.form["message"]
 		status = request.form["status"]
 		is_done_changed = False
-		print(status)
 		level = return_level(current_user.username, level_name, project_name)
 		
 		if status != "none":
@@ -255,8 +250,7 @@ def level_edit():
 		# redirect to projects.
 		return redirect('/projects')
 	level_object = return_level(current_user.username, level_name, project_name)
-	return render_template("edit_level.html", level = level_object, today = today, project_str = project_str,
-	)
+	return render_template("edit_level.html", level = level_object, today = today, project_str = project_str)
 
 @app.route('/delete_proj', methods=['GET', 'POST'])
 def delete_proj():
@@ -312,7 +306,7 @@ def forums():
 			with app.app_context():
 				mail.send(msg)
 	open_subjects = get_user_subjects(current_user.username)
-	open_chats = return_chats_dict(open_subjects) 
+	open_chats = return_chats_dict(open_subjects)
 	return render_template("forums.html", open_chats = open_chats, user = current_user)
 
 
@@ -337,8 +331,8 @@ def single_forum():
 		if current_user.username != chat.user:
 			update_num_messages(chat.id)
 		# Notifying the user who asked the question about a new reply
-		if chat.num_messages < 3: #make sure to check who sent it
-			user_sent = return_user(chat.user)
+		user_sent = return_user(chat.user)
+		if chat.num_messages < 3 and current_user.username != user_sent.username: 
 			sub_line = "התקבלה תשובה חדשה בפורום: " + chat.subject
 			msg = Message(sub_line, sender = 'taskitMail@gmail.com', recipients = [user_sent.email])
 			msg.html = "<h3 dir='rtl'> תוכן התשובה: " + content + "</h3>"
@@ -350,7 +344,7 @@ def single_forum():
 
 @app.route('/data', methods=['GET'])
 def data():
-	num_users = len(return_all_users())
+	num_users = len(return_all_users()) - 1
 	late_num = get_late_num()
 	all_projects = total_proj_num()
 	active_projects = total_active_proj_num()
@@ -370,6 +364,11 @@ def delete_user():
 	delete_all_projects(user.username)
 	delete_all_user_levels(user.username)
 	delete_user_from_db(user_id)
+	sub_line = "הודעה על הסרת חשבון" + chat.subject
+	msg = Message(sub_line, sender = 'taskitMail@gmail.com', recipients = [user.email])
+	msg.html = "<h3 dir='rtl'> זוהי הודעה על מחיקת חשבונך על ידי מנהל האתר. במידה ומדובר בטעות, השב להודעה זו.</h3>"
+	with app.app_context():
+		mail.send(msg)
 	return redirect('/users_table')
 
 
@@ -379,19 +378,43 @@ def block_user():
 	user = return_user_by_id(user_id)
 	if user.is_blocked:
 		unblock_user(user_id)
+		sub_line = "הודעה על חסימה מפורומים" + chat.subject
+		msg = Message(sub_line, sender = 'taskitMail@gmail.com', recipients = [user.email])
+		msg.html = "<h3 dir='rtl'> זוהי הודעה על ביטול חסימת חשבונך מכל הפורומים, על ידי מנהל האתר. במידה ומדובר בטעות, השב להודעה זו.</h3>"
+		with app.app_context():
+			mail.send(msg)
 		return redirect('/users_table')
 	block_user_forums(user_id)
+	sub_line = "הודעה על הסרת חשבון" + chat.subject
+	msg = Message(sub_line, sender = 'taskitMail@gmail.com', recipients = [user.email])
+	msg.html = "<h3 dir='rtl'> זוהי הודעה על חסימת חשבונך מכל הפורומים, על ידי מנהל האתר. במידה ומדובר בטעות, השב להודעה זו.</h3>"
+	with app.app_context():
+		mail.send(msg)
 	return redirect('/users_table')
 
 
-@app.route('/users_table', methods=['GET', 'POST'])
+@app.route('/users_table', methods=['GET'])
 def users_table():
 	users = return_all_users()
-	return render_template("admin_users.html", users = users)
+	chats = return_all_chats()
+	return render_template("admin_users.html", users = users, chats = chats)
+
+
+@app.route('/delete_chat', methods=['POST'])
+def delete_chat():
+	chat_id = request.form["chat_id"]
+	chat = return_chat(int(chat_id))
+	delete_chat_DB(chat_id, chat.title)
+	return redirect('/users_table')
+
 
 @app.route('/admin_subjects', methods=['GET', 'POST'])
 def admin_subjects():
 	subjects = return_subjects()
+	# adding a new subject to the list:
+	if request.method == 'POST':
+		new_subject = request.form["new_subject"]
+		add_subject(new_subject)
 	return render_template("admin_subjects.html", subjects = subjects)
 
 
@@ -454,6 +477,5 @@ def notification_center():
 
 
 if __name__ == '__main__':
-# check date, send messages?
 	app.run(debug = False)
-	#, ssl_context = "adhoc"
+	#ssl_context = "adhoc"

@@ -58,7 +58,6 @@ def reduce_active_projects(username):
     session = DBSession()
     user_object = session.query(Users).filter_by(username = username).first()
     user_object.active_projects -= 1
-    print("done!!!!!!!!!!!!!!!!!!")
     session.commit()
 
 
@@ -169,7 +168,8 @@ def delete_project(owner, project_name):
     session = DBSession()
     reduce_total_proj_num(owner)
     project = return_project(owner, project_name)
-    if project.percents_ready < 100:
+    user = return_user(owner)
+    if project.percents_ready < 100 or user.total_porject_num == 1:
         reduce_active_projects(owner)
     session.query(Projects).filter_by(owner = owner, name = project_name).delete()
     session.commit()
@@ -303,6 +303,20 @@ def add_subjects(name_list):
         session.add(subject_object)
         session.commit()
 
+
+def add_subject(name):
+    session = DBSession()
+    all_subjects = return_subjects()
+    existed = False
+    for subject in all_subjects:
+        if subject.name == name:
+            existed = True
+    if not existed:
+        subject_object = Subjects(name = name)
+        session.add(subject_object)
+        session.commit()
+
+
 def return_subjects():
     session = DBSession()
     subjects = session.query(Subjects).all()
@@ -329,7 +343,7 @@ def return_chats_dict(subjects_list):
     chats_dict = {}
     for subject in subjects_list:
         subjects_key = (subject, heading_counter)
-        chats_dict[subjects_key] = session.query(Chats).filter_by(subject = subject).all()
+        chats_dict[subjects_key] = return_all_chats()
         heading_counter += 1
     return chats_dict
 
@@ -348,8 +362,16 @@ def return_chat_messages(from_chat, subject, chat_id):
 
 def return_all_chats():
     session = DBSession()
-    chats = session.query(Chats).all()
+    list = session.query(Chats).all()
+    chats = [x for x in list[::-1]]
     return chats
+
+
+def delete_chat_DB(id, chat_name):
+    session = DBSession()
+    session.query(Messages).filter_by(from_chat = chat_name, chat_id = id).delete()
+    session.query(Chats).filter_by(id = id).delete()
+    session.commit()
 
 
 def update_num_messages(id):
