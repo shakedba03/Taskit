@@ -79,6 +79,8 @@ def signup():
 @app.route('/projects', methods=['GET', 'POST'])
 def projects():
 	global current_user
+	if current_user == None:
+		return redirect('/')
 	update_proj_color(current_user.username)
 	if request.method == 'POST':
 		# Get the project out of the DB
@@ -105,6 +107,8 @@ def projects():
 @app.route('/new_project', methods=['GET', 'POST'])
 def new_project():
 	global current_user
+	if current_user == None:
+		return redirect('/')
 	all_subjects = return_subjects()
 	today = datetime.today().strftime('%Y-%m-%d')
 	if request.method == 'POST':
@@ -156,6 +160,8 @@ def new_project():
 @app.route('/current_proj/<project_name>', methods=['GET', 'POST'])
 def current_proj(project_name):
 	global current_user
+	if current_user == None:
+		return redirect('/')
 	update_level_color(current_user.username, project_name)
 	project_object = return_project(current_user.username, project_name)
 	project_levels = return_project_levels(current_user.username, project_object.name)
@@ -179,6 +185,8 @@ def temp_edit():
 @app.route('/project_edit', methods=['GET', 'POST'])
 def project_edit():
 	global current_user, project_name
+	if current_user == None:
+		return redirect('/')
 	today = datetime.today().strftime('%Y-%m-%d')
 	all_levels = return_project_levels(current_user.username, project_name)
 	levels_str = make_str_levels(all_levels)
@@ -213,6 +221,8 @@ def temp_edit_level():
 @app.route('/level_edit', methods=['GET', 'POST'])
 def level_edit():
 	global current_user, level_name, project_name
+	if current_user == None:
+		return redirect('/')
 	today = datetime.today().strftime('%Y-%m-%d')
 	project = return_project(current_user.username, project_name)
 	project_str = make_str_project(project)
@@ -255,6 +265,8 @@ def level_edit():
 @app.route('/delete_proj', methods=['GET', 'POST'])
 def delete_proj():
 	global current_user
+	if current_user == None:
+		return redirect('/')
 	# Get the delete name
 	project_name = request.form['project_name']
 	project = return_project(current_user.username, project_name)
@@ -267,6 +279,8 @@ def delete_proj():
 @app.route('/del_level', methods=['POST'])
 def del_level():
 	global current_user
+	if current_user == None:
+		return redirect('/')
 	# Get the delete info
 	project_name = request.form['from_p']
 	level_name = request.form['del_level_name']
@@ -289,6 +303,8 @@ def del_level():
 @app.route('/forums', methods=['GET', 'POST'])
 def forums():
 	global current_user
+	if current_user == None:
+		return redirect('/')
 	if request.method == 'POST':
 		title = request.form["title"]
 		content = request.form["content"]
@@ -320,6 +336,8 @@ def single_forum_temp():
 @app.route('/single_forum', methods=['GET','POST'])
 def single_forum():
 	global current_user, clicked_chat_id
+	if current_user == None:
+		return redirect('/')
 	chat = return_chat(int(clicked_chat_id))
 	if request.method == 'POST':
 		content = request.form["reply"]
