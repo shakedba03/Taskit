@@ -321,6 +321,12 @@ def return_subjects():
     session = DBSession()
     subjects = session.query(Subjects).all()
     return subjects
+
+
+def delete_subject(id):
+    session = DBSession()
+    session.query(Subjects).filter_by(id = id).delete()
+    session.commit()
 #############################################################################################################
 
 def open_new_chat(title, content, user, date, hour, subject):

@@ -28,8 +28,11 @@ clicked_chat_id = -1
 @app.route('/', methods=['GET', 'POST'])
 def index():
 	global current_user, user_projects, default_subjects
-	
 	notification_center()
+	# adding default sbjects to the DB.
+	check_subjects = return_subjects()
+	if not check_subjects:
+		add_subjects(default_subjects)
 	admin = return_user("taskitAdmin")
 	if not admin:
 		add_user("taskitAdmin", "80261d757fbd1902559576f23a6c4968", "taskitmail@gmail.com")
@@ -47,10 +50,6 @@ def index():
 				# get the user's porjects and levels from the db.
 				current_user = return_user(username)
 				user_projects = return_user_projects(current_user.username)
-				# adding default sbjects to the DB.
-				check_subjects = return_subjects()
-				if not check_subjects:
-					add_subjects(default_subjects)
 				return redirect('/projects')
 		msg = "פרטי הכניסה שגויים"
 	return render_template("login.html", msg = msg)
@@ -117,7 +116,6 @@ def new_project():
 		subject = request.form['subject']
 		p_start_date = request.form['start_val']
 		p_end_date = request.form['end_val']
-		# p_duration = duration_calc(p_start_date, p_end_date) ##################
 		p_duration = 0
 		p_descrip = request.form['message']
 		owner = current_user.username
@@ -162,9 +160,11 @@ def current_proj(project_name):
 	global current_user
 	if current_user == None:
 		return redirect('/')
+	# Updating the colors of the project's levels, pulling data from DB.
 	update_level_color(current_user.username, project_name)
 	project_object = return_project(current_user.username, project_name)
 	project_levels = return_project_levels(current_user.username, project_object.name)
+	# Presenting closest due date to the user. If there is none, the due is "-".
 	due_date = "-"
 	if project_object.percents_ready != 100:
 		due_level = return_closest_due(project_levels)
@@ -187,10 +187,12 @@ def project_edit():
 	global current_user, project_name
 	if current_user == None:
 		return redirect('/')
+	# Pulling data from DB.
 	today = datetime.today().strftime('%Y-%m-%d')
 	all_levels = return_project_levels(current_user.username, project_name)
 	levels_str = make_str_levels(all_levels)
 	project_object = return_project(current_user.username, project_name)
+	# When the user edits the project:
 	if request.method == 'POST':
 		name = request.form["name"]
 		start_date = request.form["start_date"]
@@ -202,7 +204,7 @@ def project_edit():
 		edit_project(current_user.username, project_name, name, start_date, end_date, subject, descrip)
 		return redirect('/projects')
 	
-	# pulling all user's project from the DB into a hidden input in the html.
+	# Pulling all user's project from the DB into a hidden input in the html.
 	user_projects = return_user_projects(current_user.username)
 	all_projects_names = get_name_list(user_projects)	
 	subjects = return_subjects()
@@ -215,7 +217,7 @@ def temp_edit_level():
 	# Get the level name
 	level_name = request.form['level_name']
 	project_name = request.form['p_name']
-	# Redirect to '/project_edit'
+	# Redirect to '/level_edit'
 	return redirect('/level_edit')
 		
 @app.route('/level_edit', methods=['GET', 'POST'])
@@ -223,10 +225,12 @@ def level_edit():
 	global current_user, level_name, project_name
 	if current_user == None:
 		return redirect('/')
+	# Pulling data from DB.
 	today = datetime.today().strftime('%Y-%m-%d')
 	project = return_project(current_user.username, project_name)
 	project_str = make_str_project(project)
 	levels = return_project_levels(current_user.username, project_name)
+	# When the user edits a level:
 	if request.method == "POST":
 		name = request.form["name"]
 		start_date = request.form["start_date"]
@@ -273,8 +277,8 @@ def delete_proj():
 	delete_project(current_user.username, project_name)
 	# Delete the project's levels:
 	delete_all_levels(current_user.username, project_name)
-	
 	return redirect('/projects')
+
 
 @app.route('/del_level', methods=['POST'])
 def del_level():
@@ -305,6 +309,7 @@ def forums():
 	global current_user
 	if current_user == None:
 		return redirect('/')
+	# When a new question is sent:
 	if request.method == 'POST':
 		title = request.form["title"]
 		content = request.form["content"]
@@ -329,7 +334,9 @@ def forums():
 @app.route('/single_forum_temp', methods=['POST'])
 def single_forum_temp():
 	global clicked_chat_id
+	# Finding the relevant chat to open
 	clicked_chat_id = request.form["chat_id"]
+	# Redirect to /single_forum
 	return redirect('/single_forum')
 
 
@@ -362,6 +369,7 @@ def single_forum():
 
 @app.route('/data', methods=['GET'])
 def data():
+	# Calculating usage data of the website
 	num_users = len(return_all_users()) - 1
 	late_num = get_late_num()
 	all_projects = total_proj_num()
@@ -377,11 +385,13 @@ def data():
 
 @app.route('/delete_user', methods=['POST'])
 def delete_user():
+	# Deleting a user by the Admin
 	user_id = request.form["user_id"]
 	user = return_user_by_id(user_id)
 	delete_all_projects(user.username)
 	delete_all_user_levels(user.username)
 	delete_user_from_db(user_id)
+	# Notifying the user 
 	sub_line = "הודעה על הסרת חשבון" + chat.subject
 	msg = Message(sub_line, sender = 'taskitMail@gmail.com', recipients = [user.email])
 	msg.html = "<h3 dir='rtl'> זוהי הודעה על מחיקת חשבונך על ידי מנהל האתר. במידה ומדובר בטעות, השב להודעה זו.</h3>"
@@ -394,16 +404,20 @@ def delete_user():
 def block_user():
 	user_id = request.form["user_id"]
 	user = return_user_by_id(user_id)
+	# Unblocking a user from all forums
 	if user.is_blocked:
 		unblock_user(user_id)
-		sub_line = "הודעה על חסימה מפורומים" + chat.subject
+		# Notifying the user
+		sub_line = "הודעה על ביטול חסימה מפורומים" + chat.subject
 		msg = Message(sub_line, sender = 'taskitMail@gmail.com', recipients = [user.email])
 		msg.html = "<h3 dir='rtl'> זוהי הודעה על ביטול חסימת חשבונך מכל הפורומים, על ידי מנהל האתר. במידה ומדובר בטעות, השב להודעה זו.</h3>"
 		with app.app_context():
 			mail.send(msg)
 		return redirect('/users_table')
+	# Blocking a user from all forums
 	block_user_forums(user_id)
-	sub_line = "הודעה על הסרת חשבון" + chat.subject
+	# Notifying the user
+	sub_line = "הודעה על חסימה מפורומים" + chat.subject
 	msg = Message(sub_line, sender = 'taskitMail@gmail.com', recipients = [user.email])
 	msg.html = "<h3 dir='rtl'> זוהי הודעה על חסימת חשבונך מכל הפורומים, על ידי מנהל האתר. במידה ומדובר בטעות, השב להודעה זו.</h3>"
 	with app.app_context():
@@ -413,6 +427,7 @@ def block_user():
 
 @app.route('/users_table', methods=['GET'])
 def users_table():
+	# Showing the Admin 2 tables - users and chats.
 	users = return_all_users()
 	chats = return_all_chats()
 	return render_template("admin_users.html", users = users, chats = chats)
@@ -420,6 +435,7 @@ def users_table():
 
 @app.route('/delete_chat', methods=['POST'])
 def delete_chat():
+	# Deleting a chat
 	chat_id = request.form["chat_id"]
 	chat = return_chat(int(chat_id))
 	delete_chat_DB(chat_id, chat.title)
@@ -433,13 +449,24 @@ def admin_subjects():
 	if request.method == 'POST':
 		new_subject = request.form["new_subject"]
 		add_subject(new_subject)
+		subjects = return_subjects()
 	return render_template("admin_subjects.html", subjects = subjects)
+
+
+@app.route('/admin_subjects_delete', methods=['POST'])
+def admin_subjects_delete():
+	# Deleting a subject
+	subject_id = request.form["subject_id"]
+	delete_subject(subject_id)
+	return redirect('/admin_subjects')
 
 
 def notification_center():
 	users = return_all_users()
+	# Looping through all users, sending relevant emails about due dates of projects and levels
 	for user in users:
 		user_alerts = project_submission_alert(user)
+		# Projects notifications
 		if len(user_alerts.keys()) > 0:
 			for project in user_alerts:
 				project_object = return_project(user.username, project)
@@ -463,7 +490,7 @@ def notification_center():
 					update_alert_status(user.username, project_object.name, 3)	
 
 
-		# levels nontifications.
+		# levels notifications.
 		user_total_projects = return_user_projects(user.username)
 		for project_object in user_total_projects:
 			levels = return_project_levels(user.username, project_object.name)	

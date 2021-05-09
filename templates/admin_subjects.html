@@ -109,7 +109,7 @@
               <tr>
                 <th scope="row" style="width: 30%;">{{ subject.id }}</th>
                 <td style="width: 30%;">{{ subject.name }}</td>
-                <td style="width: 30%;"><form action="/admin_subjects" method="POST" onsubmit="return confirm('למחוק את המקצוע לצמיתות?');">
+                <td style="width: 30%;"><form action="/admin_subjects_delete" method="POST" onsubmit="return confirm('למחוק את המקצוע לצמיתות?');">
                     <input type="hidden" value="{{ subject.id }}" name="subject_id">
                     <button class="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn" type="submit">מחיקה</button>
                 </form></td>
@@ -122,19 +122,19 @@
 </center>
    </section>
 
-   <div class="row" id="questionForm" style="position: sticky; bottom: 5%; width:100% ;">
+   <div class="row" id="questionForm" style="position: sticky; bottom: 5%; width:100% ; right: 10%;">
     <form action="/admin_subjects" method="POST">
-    <div class="col-lg-2">
+    
         <div class="form-group">
             <div class="input-group mb-3">
                 <input required type="text" class="form-control" name="new_subject" placeholder="מקצוע חדש ">
             </div>
         </div>
-    </div>
+    
    
-    <div class="col-lg-2">
+    
         <button class="button rounded-0 primary-bg text-white w-100 btn_1 boxed-btn" type="submit">הוספה</button>
-    </div>
+    
     </form>
 </div>
 
