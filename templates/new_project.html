@@ -54,9 +54,9 @@
                         <div class="main-menu  d-none d-lg-block">
                             <nav>
                                 <ul id="navigation">
-                                    <li><a href="{{url_for('projects')}}">כל הפרוייקטים</a></li>
-                                    <li><a href="{{url_for('new_project')}}">פרוייקט חדש</a></li>
-                                    <li><a href="{{url_for('forums')}}">פורומים</a></li>
+                                    <li><a href="{{url_for('projects', username = username)}}">כל הפרוייקטים</a></li>
+                                    <li><a href="{{url_for('new_project', username = username)}}">פרוייקט חדש</a></li>
+                                    <li><a href="{{url_for('forums', username = username)}}">פורומים</a></li>
                                 </ul>
                             </nav>
                         </div>
@@ -83,7 +83,9 @@
         <div class="container">
             <div class="d-none d-sm-block mb-5 pb-4">
                 <form class="form-contact contact_form" id="contactForm" novalidate="novalidate" method="POST"
-                    action="/new_project">
+                    action="{{ url_for('new_project', username = username) }}">
+                    <input type="hidden" value="{{ username }}" name ="user_ajax">
+                    <input type="hidden" value="projects" name ="page">
                     <center>
                         <h1>פרטי הפרוייקט</h1>
                     </center>

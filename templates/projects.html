@@ -27,6 +27,17 @@
     <link rel="stylesheet" href="../static/css/responsive.css">
     <link rel="stylesheet" href="../static/projects.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script>
+        function getUserData(){
+            var userCookie  =  getCookie("username_cookie");
+            var user_input = document.getElementsByName("username")[0];
+            user_input.value = userCookie;
+            alert(user_input.value);
+            
+        }
+        window.onload = getUserData()
+    </script>
 </head>
 
 <body dir="rtl">
@@ -35,6 +46,11 @@
         <![endif]-->
 
     <!-- header-start -->
+    <form hidden method="POST" action="/manage_user_cookies" id="cookieForm">
+        <input type="hidden" name ="username" value = "">
+        <input type="hidden" name ="page" value = "projects">
+    </form>
+
     <header>
         <div class="header-area ">
             <div id="sticky-header" class="main-header-area sticky">
@@ -51,9 +67,9 @@
                             <div class="main-menu  d-none d-lg-block">
                                 <nav>
                                     <ul id="navigation">
-                                        <li><a href="{{url_for('projects')}}">כל הפרוייקטים</a></li>
-                                        <li><a href="{{url_for('new_project')}}">פרוייקט חדש</a></li>
-                                        <li><a href="{{url_for('forums')}}">פורומים</a></li>
+                                        <li><a href="{{url_for('projects', username = username)}}">כל הפרוייקטים</a></li>
+                                        <li><a href="{{url_for('new_project', username = username)}}">פרוייקט חדש</a></li>
+                                        <li><a href="{{url_for('forums', username = username)}}">פורומים</a></li>
                                     </ul>
                                 </nav>
                             </div>
@@ -76,7 +92,7 @@
     <!-- bradcam_area_end -->
 
     
-    <a href="{{url_for('new_project')}}"><div style="font-size:350%" class="fa" id="plus">&#xf067;</div></a>
+    <a href="{{url_for('new_project', username = username)}}"><div style="font-size:350%" class="fa" id="plus">&#xf067;</div></a>
 
 
     <!-- our_courses_start -->
@@ -122,7 +138,7 @@
                                 <br>
                                 
                                 <p>{{ user_projects[key].end_date }} : {{ user_projects[key].name }}</p>
-                                <form method="POST" action="/projects">
+                                <form method="POST" action="{{url_for('projects', username = username)}}">
                                     <input type="hidden" name="project_name" 
                                     value = '{{ key.name }}' >
                                     <button type="submit" class="btn-hover color-10">צפייה</button>
@@ -182,7 +198,7 @@
                                 <p style="word-wrap:break-word;max-width: fit-content;">{{ key.description}}</p>
                                 <br>
                                 <p>{{ user_projects[key].end_date }} : {{ user_projects[key].name }}</p>
-                                <form method="POST" action="/projects">
+                                <form method="POST" action="{{url_for('projects', username = username)}}">
                                     <input type="hidden" name="project_name" 
                                     value = '{{ key.name }}' >
                                     <button type="submit" class="btn-hover color-10">צפייה</button>
@@ -309,6 +325,7 @@
 
 
     <!-- JS here -->
+    <script src="../static/js/user_cookie.js"></script>
     <script src="../static/js/vendor/modernizr-3.5.0.min.js"></script>
     <script src="../static/js/vendor/jquery-1.12.4.min.js"></script>
     <script src="../static/js/popper.min.js"></script>

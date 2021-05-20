@@ -25,6 +25,10 @@
         var password = document.getElementsByName("password")[0];
         var hashed = md5(password.value);
         password.value = hashed;
+        var username = document.getElementsByName("username")[0];
+        var cvalue = username.value;
+        alert(cvalue);
+        setCookie("username_cookie", cvalue, 1);
       }
     </script>
     <div class="content" style="position: absolute; top: 15%; left: 10%;">
@@ -70,7 +74,7 @@
       </div>
     </div>
 
-    
+      <script src="../static/js/user_cookie.js"></script>
       <script src="../static/js/jquery-3.3.1.min.js"></script>
       <script src="../static/js/popper.min.js"></script>
       <script src="../static/js/bootstrap.min.js"></script>

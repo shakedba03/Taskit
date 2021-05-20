@@ -52,9 +52,9 @@
                             <div class="main-menu  d-none d-lg-block">
                                 <nav>
                                     <ul id="navigation">
-                                        <li><a href="{{url_for('projects')}}">כל הפרוייקטים</a></li>
-                                        <li><a href="{{url_for('new_project')}}">פרוייקט חדש</a></li>
-                                        <li><a href="{{url_for('forums')}}">פורומים</a></li>
+                                        <li><a href="{{url_for('projects', username = username)}}">כל הפרוייקטים</a></li>
+                                        <li><a href="{{url_for('new_project', username = username)}}">פרוייקט חדש</a></li>
+                                        <li><a href="{{url_for('forums', username = username)}}">פורומים</a></li>
                                     </ul>
                                 </nav>
                             </div>
@@ -109,6 +109,7 @@
                                                     <div class="col-xl-4 col-lg-4">
                                                         <form action="/single_forum_temp" method="POST">
                                                             <input type="hidden" name="chat_id" value="{{ chat.id }}">
+                                                            <input type="hidden" name="username" value="{{ username }}">
                                                             <button type="submit" class="btn-hover color-10" id="submit"
                                                             style="height:100%;"> {{chat.title }}</button>
                                                         </form>
@@ -129,7 +130,7 @@
 
     <div class="row" id="questionForm" style="position: sticky; bottom: 5%; width:100% ;">
         <div class="col-lg-6">
-            <form action="/forums" method="POST">
+            <form action="{{ url_for('forums', username = username) }}" method="POST">
                 <div class="form-group">
                     <div class="input-group mb-3">
                         <textarea required type="text" class="form-control" name="content" placeholder="שאל/י שאלה" rows="2"></textarea>

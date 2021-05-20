@@ -97,9 +97,8 @@ $(document).ready(function(){
                 $(form).ajaxSubmit({
                     type:"POST",
                     data: $(form).serialize(),
-                    url:"/new_project",
+                    url: "/new_project/"+ document.getElementsByName("user_ajax")[0].value,
                     success: function() {
-                        
                         $('#contactForm :input').attr('disabled', 'disabled');
                         $('#contactForm').fadeTo( "slow", 1, function() {
                             $(this).find(':input').attr('disabled', 'disabled');
@@ -108,10 +107,11 @@ $(document).ready(function(){
                             $('.modal').modal('hide');
 		                	$('#success').modal('show');
                             alert("הפרוייקט נוסף למערכת. ניתן לצפות בו במסך הפרוייקטים.");
-                            window.location.href ='/projects';
+                            window.location.href = "/projects/" + document.getElementsByName("user_ajax")[0].value;
                         })
                     },
                     error: function() {
+
                         $('#contactForm').fadeTo( "slow", 1, function() {
                             // $('#error').fadeIn()
                             // $('.modal').modal('hide');

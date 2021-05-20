@@ -141,7 +141,8 @@ $(document).ready(function () {
                     $(form).ajaxSubmit({
                         type: "POST",
                         data: $(form).serialize(),
-                        url: "/project_edit",
+                        url: "/project_edit/" + document.getElementsByName("user_ajax")[0].value + "/" + 
+                        document.getElementsByName("user_ajax_p")[0].value,
                         success: function () {
 
                             $('.alert').alert()
@@ -154,7 +155,7 @@ $(document).ready(function () {
                                 $('.modal').modal('hide');
                                 $('#success').modal('show');
                                 alert("העדכון הושלם.")
-                                window.location.href ='/projects';
+                                window.location.href = '/projects/' + document.getElementsByName("user_ajax")[0].value;
                             })
                         },
                         error: function () {

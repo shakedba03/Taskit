@@ -13,20 +13,20 @@
     <!-- Place favicon.ico in the root directory -->
 
     <!-- ../static/../static/css here -->
-    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../static/css/owl.carousel.min.css">
-    <link rel="stylesheet" href="../static/css/magnific-popup.css">
-    <link rel="stylesheet" href="../static/css/font-awesome.min.css">
-    <link rel="stylesheet" href="../static/css/themify-icons.css">
-    <link rel="stylesheet" href="../static/css/nice-select.css">
-    <link rel="stylesheet" href="../static/css/flaticon.css">
-    <link rel="stylesheet" href="../static/css/gijgo.css">
-    <link rel="stylesheet" href="../static/css/animate.css">
-    <link rel="stylesheet" href="../static/css/slicknav.css">
-    <link rel="stylesheet" href="../static/css/style.css">
-    <link rel="stylesheet" href="../static/css/responsive.css">
-    <link rel="stylesheet" href="../static/css/current_proj.css">
-    <link rel="stylesheet" href="../static/projects.css">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="/static/css/magnific-popup.css">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/themify-icons.css">
+    <link rel="stylesheet" href="/static/css/nice-select.css">
+    <link rel="stylesheet" href="/static/css/flaticon.css">
+    <link rel="stylesheet" href="/static/css/gijgo.css">
+    <link rel="stylesheet" href="/static/css/animate.css">
+    <link rel="stylesheet" href="/static/css/slicknav.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/responsive.css">
+    <link rel="stylesheet" href="/static/css/current_proj.css">
+    <link rel="stylesheet" href="/static/projects.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
@@ -52,9 +52,9 @@
                             <div class="main-menu  d-none d-lg-block">
                                 <nav>
                                     <ul id="navigation">
-                                        <li><a href="{{url_for('projects')}}">כל הפרוייקטים</a></li>
-                                        <li><a href="{{url_for('new_project')}}">פרוייקט חדש</a></li>
-                                        <li><a href="{{url_for('forums')}}">פורומים</a></li>
+                                        <li><a href="{{url_for('projects', username = username)}}">כל הפרוייקטים</a></li>
+                                        <li><a href="{{url_for('new_project', username = username)}}">פרוייקט חדש</a></li>
+                                        <li><a href="{{url_for('forums', username = username)}}">פורומים</a></li>
                                     </ul>
                                 </nav>
                             </div>
@@ -103,11 +103,15 @@
                             <form method="POST" action="/temp_edit">
                                 <input type="hidden" name="project_name" 
                                 value = '{{ project_object.name }}' >
+                                <input type="hidden" name="username" 
+                                value = '{{ username }}' >
                                 <button type="submit" class="btn-hover color-10">עריכה</button>
                             </form>
                             <form method="POST" action="/delete_proj" onsubmit="return confirm('האם את/ה בטוח/ה?');">
                                 <input type="hidden" name="project_name" 
                                 value = '{{ project_object.name }}' >
+                                <input type="hidden" name="username" 
+                                value = '{{ username }}' >
                                 <button type="submit" class="btn-hover color-10">מחיקת פרוייקט</button>
                             </form>
                         </div>
@@ -171,11 +175,13 @@
                                 <p style="word-wrap:break-word;max-width: fit-content;">{{ level.description}}</p>
                                 <br>
                                 <br>
-                                <form method="POST" action="/temp_edit_level">
+                                <form method="POST" action="{{ url_for('temp_edit_level') }}">
                                     <input type="hidden" name="level_name" 
                                     value = '{{ level.name }}' >
                                     <input type="hidden" name="p_name" 
                                     value = '{{ project_object.name }}' >
+                                    <input type="hidden" name="username" 
+                                    value = '{{ username }}' >
                                     <button type="submit" class="btn-hover color-10">עריכה</button>
                                 </form>
                             </div>
@@ -358,33 +364,33 @@
 
 
     <!-- JS here -->
-    <script src="../static/js/vendor/modernizr-3.5.0.min.js"></script>
-    <script src="../static/js/vendor/jquery-1.12.4.min.js"></script>
-    <script src="../static/js/popper.min.js"></script>
-    <script src="../static/js/bootstrap.min.js"></script>
-    <script src="../static/js/owl.carousel.min.js"></script>
-    <script src="../static/js/isotope.pkgd.min.js"></script>
-    <script src="../static/js/ajax-form.js"></script>
-    <script src="../static/js/waypoints.min.js"></script>
-    <script src="../static/js/jquery.counterup.min.js"></script>
-    <script src="../static/js/imagesloaded.pkgd.min.js"></script>
-    <script src="../static/js/scrollIt.js"></script>
-    <script src="../static/js/jquery.scrollUp.min.js"></script>
-    <script src="../static/js/wow.min.js"></script>
-    <script src="../static/js/nice-select.min.js"></script>
-    <script src="../static/js/jquery.slicknav.min.js"></script>
-    <script src="../static/js/jquery.magnific-popup.min.js"></script>
-    <script src="../static/js/plugins.js"></script>
-    <script src="../static/js/gijgo.min.js"></script>
+    <script src="/static/js/vendor/modernizr-3.5.0.min.js"></script>
+    <script src="/static/js/vendor/jquery-1.12.4.min.js"></script>
+    <script src="/static/js/popper.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/owl.carousel.min.js"></script>
+    <script src="/static/js/isotope.pkgd.min.js"></script>
+    <script src="/static/js/ajax-form.js"></script>
+    <script src="/static/js/waypoints.min.js"></script>
+    <script src="/static/js/jquery.counterup.min.js"></script>
+    <script src="/static/js/imagesloaded.pkgd.min.js"></script>
+    <script src="/static/js/scrollIt.js"></script>
+    <script src="/static/js/jquery.scrollUp.min.js"></script>
+    <script src="/static/js/wow.min.js"></script>
+    <script src="/static/js/nice-select.min.js"></script>
+    <script src="/static/js/jquery.slicknav.min.js"></script>
+    <script src="/static/js/jquery.magnific-popup.min.js"></script>
+    <script src="/static/js/plugins.js"></script>
+    <script src="/static/js/gijgo.min.js"></script>
 
     <!--contact js-->
-    <script src="../static/js/contact.js"></script>
-    <script src="../static/js/jquery.ajaxchimp.min.js"></script>
-    <script src="../static/js/jquery.form.js"></script>
-    <script src="../static/js/jquery.validate.min.js"></script>
-    <script src="../static/js/mail-script.js"></script>
+    <script src="/static/js/contact.js"></script>
+    <script src="/static/js/jquery.ajaxchimp.min.js"></script>
+    <script src="/static/js/jquery.form.js"></script>
+    <script src="/static/js/jquery.validate.min.js"></script>
+    <script src="/static/js/mail-script.js"></script>
 
-    <script src="../static/js/main.js"></script>
+    <script src="/static/js/main.js"></script>
 
 </body>
 

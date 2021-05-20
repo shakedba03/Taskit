@@ -19,16 +19,10 @@ app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
 
-current_user = None
-default_subjects = ["אנגלית", "מתמטיקה", "מדעי המחשב", "מדעי החברה", "סייבר", "ביולוגיה", "פיזיקה", "אומנות"]
-project_name = ""
-level_name = ""
-clicked_chat_id = -1
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
-	global current_user, user_projects, default_subjects
-	notification_center()
+	default_subjects = ["אנגלית", "מתמטיקה", "מדעי המחשב", "מדעי החברה", "סייבר", "ביולוגיה", "פיזיקה", "אומנות"]
+	notification_center() 
 	# adding default sbjects to the DB.
 	check_subjects = return_subjects()
 	if not check_subjects:
@@ -47,10 +41,8 @@ def index():
 		
 		for user in users_list:
 			if user.username == username and user.password == password:
-				# get the user's porjects and levels from the db.
-				current_user = return_user(username)
-				user_projects = return_user_projects(current_user.username)
-				return redirect('/projects')
+				
+				return redirect(url_for('projects', username = username))
 		msg = "פרטי הכניסה שגויים"
 	return render_template("login.html", msg = msg)
 	
@@ -72,25 +64,34 @@ def signup():
 			msg = "אימות הסיסמה אינו תואם לסיסמה שהוזנה."
 		if msg == "":
 			add_user(username, password, email)
-			return render_template("login.html")
+			return redirect(url_for("index"))
 	return render_template("signup.html", msg = msg)
 
-@app.route('/projects', methods=['GET', 'POST'])
-def projects():
-	global current_user
-	if current_user == None:
-		return redirect('/')
+
+@app.route('/manage_user_cookies', methods=['POST'])
+def manage_user_cookies():
+	username = request.form["user_ajax"]
+	page = request.form["page"]
+	if page == "projects":
+		return redirect(url_for('projects', username = username))
+	
+	return redirect('/')
+
+
+@app.route('/projects/<username>', methods=['GET', 'POST'])
+def projects(username):
+	current_user = return_user(username)
 	update_proj_color(current_user.username)
 	if request.method == 'POST':
 		# Get the project out of the DB
 		clicked_proj = request.form['project_name']
 		# Redirect to '/current_proj'
-		return redirect(url_for('current_proj', project_name = clicked_proj))
+		return redirect(url_for('current_proj', username = username, project_name = clicked_proj))
 
 	# Pull from the project table all projects related to the user.
 	# Put it in a list.
 	# Get the date of the closest due date.
-	current_user = return_user(current_user.username)
+	# get the user's porjects and levels from the db.
 	user_projects = return_user_projects(current_user.username)
 	projects_due_dict = {}
 	if current_user.total_porject_num != 0:
@@ -101,11 +102,11 @@ def projects():
 			levels = return_project_levels(current_user.username, project.name)
 			projects_due_dict[project] = return_closest_due(levels)
 			
-	return render_template("projects.html", user_projects = projects_due_dict)
+	return render_template("projects.html", user_projects = projects_due_dict, username = username)
 
-@app.route('/new_project', methods=['GET', 'POST'])
-def new_project():
-	global current_user
+@app.route('/new_project/<username>', methods=['GET', 'POST'])
+def new_project(username):
+	current_user = return_user(username)
 	if current_user == None:
 		return redirect('/')
 	all_subjects = return_subjects()
@@ -148,16 +149,16 @@ def new_project():
 		levels = return_project_levels(current_user.username, p_name)
 		# adjusting the percents of each level.
 		fix_sum_percents(levels, p_duration, p_name, current_user.username)
-		return redirect('/projects')
+		return redirect(url_for("projects", username = current_user.username))
 	# pulling all user's project from the DB into a hidden input in the html.
 	user_projects = return_user_projects(current_user.username)
 	all_projects_names = get_name_list(user_projects)
 	return render_template("new_project.html", today = today, all_projects_names = all_projects_names,
-	all_subjects = all_subjects)
+	all_subjects = all_subjects, username = username)
 
-@app.route('/current_proj/<project_name>', methods=['GET', 'POST'])
-def current_proj(project_name):
-	global current_user
+@app.route('/current_proj/<username>/<project_name>', methods=['GET', 'POST'])
+def current_proj(username, project_name):
+	current_user = return_user(username)
 	if current_user == None:
 		return redirect('/')
 	# Updating the colors of the project's levels, pulling data from DB.
@@ -170,21 +171,21 @@ def current_proj(project_name):
 		due_level = return_closest_due(project_levels)
 		due_date = due_level.end_date
 	return render_template("current_proj.html", project_object = project_object, due_date = due_date,
-	levels_list = project_levels)
+	levels_list = project_levels, username = username)
 
 
 @app.route('/temp_edit', methods=['POST'])
 def temp_edit():
-	global project_name
 	# Get the project name
+	username = request.form['username']
 	project_name = request.form['project_name']
 	# Redirect to '/project_edit'
-	return redirect('project_edit')
+	return redirect(url_for('project_edit', username = username, project_name = project_name))
 	
 
-@app.route('/project_edit', methods=['GET', 'POST'])
-def project_edit():
-	global current_user, project_name
+@app.route('/project_edit/<username>/<project_name>', methods=['GET', 'POST'])
+def project_edit(username, project_name):
+	current_user = return_user(username)
 	if current_user == None:
 		return redirect('/')
 	# Pulling data from DB.
@@ -202,27 +203,27 @@ def project_edit():
 
 		update_from_proj(current_user.username, project_name, name)
 		edit_project(current_user.username, project_name, name, start_date, end_date, subject, descrip)
-		return redirect('/projects')
+
 	
 	# Pulling all user's project from the DB into a hidden input in the html.
 	user_projects = return_user_projects(current_user.username)
 	all_projects_names = get_name_list(user_projects)	
 	subjects = return_subjects()
 	return render_template("project_edit.html", project = project_object, today = today,
-	levels_str = levels_str, all_projects_names = all_projects_names, subjects = subjects)
+	levels_str = levels_str, all_projects_names = all_projects_names, subjects = subjects, username = username)
 
-@app.route('/temp_edit_level', methods=['POST'])
+@app.route('/temp_edit_level', methods=['GET','POST'])
 def temp_edit_level():
-	global level_name, project_name
 	# Get the level name
 	level_name = request.form['level_name']
 	project_name = request.form['p_name']
+	username = request.form["username"]
 	# Redirect to '/level_edit'
-	return redirect('/level_edit')
+	return redirect(url_for('level_edit', username = username, level_name = level_name, project_name = project_name))
 		
-@app.route('/level_edit', methods=['GET', 'POST'])
-def level_edit():
-	global current_user, level_name, project_name
+@app.route('/level_edit/<username>/<level_name>/<project_name>', methods=['GET', 'POST'])
+def level_edit(username, level_name, project_name):
+	current_user = return_user(username)
 	if current_user == None:
 		return redirect('/')
 	# Pulling data from DB.
@@ -243,7 +244,6 @@ def level_edit():
 		if status != "none":
 			is_done_changed  = True
 		
-			
 		# Edit the level's info.
 		edit_level(current_user.username, project_name, level_name, 
 		name, is_done_changed , start_date, end_date, descrip)
@@ -262,27 +262,28 @@ def level_edit():
 		new_percents = percents_ready(levels)
 		update_percents(current_user.username, project_name, new_percents)
 		# redirect to projects.
-		return redirect('/projects')
 	level_object = return_level(current_user.username, level_name, project_name)
-	return render_template("edit_level.html", level = level_object, today = today, project_str = project_str)
+	return render_template("edit_level.html", level = level_object, today = today, project_str = project_str,
+	username = username, project_name = project_name)
 
-@app.route('/delete_proj', methods=['GET', 'POST'])
+@app.route('/delete_proj', methods=['POST'])
 def delete_proj():
-	global current_user
+	username = request.form["username"]
+	current_user = return_user(username)
 	if current_user == None:
 		return redirect('/')
 	# Get the delete name
 	project_name = request.form['project_name']
-	project = return_project(current_user.username, project_name)
 	delete_project(current_user.username, project_name)
 	# Delete the project's levels:
 	delete_all_levels(current_user.username, project_name)
-	return redirect('/projects')
+	return redirect(url_for('projects', username = username))
 
 
 @app.route('/del_level', methods=['POST'])
 def del_level():
-	global current_user
+	username = request.form["username"]
+	current_user = return_user(username)
 	if current_user == None:
 		return redirect('/')
 	# Get the delete info
@@ -294,19 +295,21 @@ def del_level():
 	# check if there are other levels in the project. if not, delete the project.
 	levels = return_project_levels(current_user.username, project_name)
 	if not levels:
+		if current_user == None:
+			return redirect('/')
 		delete_project(current_user.username, project_name)
-		return redirect('/projects')
+		return redirect(url_for('projects', username = username))
 	# calc the new duration of the project, change the percents of other levels.
 	new_proj_duration = calc_new_duration(levels)
 	fix_sum_percents(levels, new_proj_duration, project_name, current_user.username)
 	# update the duration of the project.
 	update_project_duration(current_user.username, project_name, new_proj_duration)	
-	return redirect('/projects')
+	return redirect(url_for('projects', username = username))
 
 
-@app.route('/forums', methods=['GET', 'POST'])
-def forums():
-	global current_user
+@app.route('/forums/<username>', methods=['GET', 'POST'])
+def forums(username):
+	current_user = return_user(username)
 	if current_user == None:
 		return redirect('/')
 	# When a new question is sent:
@@ -328,25 +331,26 @@ def forums():
 				mail.send(msg)
 	open_subjects = get_user_subjects(current_user.username)
 	open_chats = return_chats_dict(open_subjects)
-	return render_template("forums.html", open_chats = open_chats, user = current_user)
+	return render_template("forums.html", open_chats = open_chats, user = current_user, username = username)
 
 
 @app.route('/single_forum_temp', methods=['POST'])
 def single_forum_temp():
-	global clicked_chat_id
 	# Finding the relevant chat to open
 	clicked_chat_id = request.form["chat_id"]
+	username = request.form["username"]
 	# Redirect to /single_forum
-	return redirect('/single_forum')
+	return redirect(url_for('single_forum', username = username, clicked_chat_id = clicked_chat_id))
 
 
-@app.route('/single_forum', methods=['GET','POST'])
-def single_forum():
-	global current_user, clicked_chat_id
+@app.route('/single_forum/<username>/<clicked_chat_id>', methods=['GET','POST'])
+def single_forum(username, clicked_chat_id):
+	current_user = return_user(username)
 	if current_user == None:
 		return redirect('/')
 	chat = return_chat(int(clicked_chat_id))
 	if request.method == 'POST':
+		chat = return_chat(int(clicked_chat_id))
 		content = request.form["reply"]
 		date = datetime.today().strftime("%Y-%m-%d")
 		hour = str(datetime.today().hour) + ":" + str(datetime.today().minute)
@@ -364,7 +368,8 @@ def single_forum():
 			with app.app_context():
 				mail.send(msg)
 	messages = return_chat_messages(chat.title, chat.subject, chat.id)
-	return render_template("single_forum.html", chat = chat, messages = messages)  
+	return render_template("single_forum.html", chat = chat, messages = messages, username = username, 
+	clicked_chat_id = clicked_chat_id)  
 
 
 @app.route('/data', methods=['GET'])
@@ -392,7 +397,7 @@ def delete_user():
 	delete_all_user_levels(user.username)
 	delete_user_from_db(user_id)
 	# Notifying the user 
-	sub_line = "הודעה על הסרת חשבון" + chat.subject
+	sub_line = "הודעה על הסרת חשבון"
 	msg = Message(sub_line, sender = 'taskitMail@gmail.com', recipients = [user.email])
 	msg.html = "<h3 dir='rtl'> זוהי הודעה על מחיקת חשבונך על ידי מנהל האתר. במידה ומדובר בטעות, השב להודעה זו.</h3>"
 	with app.app_context():
@@ -408,7 +413,7 @@ def block_user():
 	if user.is_blocked:
 		unblock_user(user_id)
 		# Notifying the user
-		sub_line = "הודעה על ביטול חסימה מפורומים" + chat.subject
+		sub_line = "הודעה על ביטול חסימה מפורומים"
 		msg = Message(sub_line, sender = 'taskitMail@gmail.com', recipients = [user.email])
 		msg.html = "<h3 dir='rtl'> זוהי הודעה על ביטול חסימת חשבונך מכל הפורומים, על ידי מנהל האתר. במידה ומדובר בטעות, השב להודעה זו.</h3>"
 		with app.app_context():
@@ -417,7 +422,7 @@ def block_user():
 	# Blocking a user from all forums
 	block_user_forums(user_id)
 	# Notifying the user
-	sub_line = "הודעה על חסימה מפורומים" + chat.subject
+	sub_line = "הודעה על חסימה מפורומים"
 	msg = Message(sub_line, sender = 'taskitMail@gmail.com', recipients = [user.email])
 	msg.html = "<h3 dir='rtl'> זוהי הודעה על חסימת חשבונך מכל הפורומים, על ידי מנהל האתר. במידה ומדובר בטעות, השב להודעה זו.</h3>"
 	with app.app_context():
@@ -522,5 +527,5 @@ def notification_center():
 
 
 if __name__ == '__main__':
-	app.run(debug = False)
+	app.run(debug = True)
 	#ssl_context = "adhoc"

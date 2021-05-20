@@ -250,10 +250,3 @@ def sent_monthly():
     return sent_counter
 
 
-# def order_chats_by_date():
-#     chats = return_all_chats()
-#     ordered_list = []
-#     max_date = format_date('2000-12-10')
-#     for chat in chats:
-#         for other_chat in chats:
-#             if format_date(chat.date) > max_date
