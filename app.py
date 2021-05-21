@@ -14,7 +14,7 @@ app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'taskitMail'
 app.config['MAIL_PASSWORD'] = 'cyberprojectpassword%'
 app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USE_SSL'] = False
 
 mail = Mail(app)
 
