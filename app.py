@@ -6,13 +6,14 @@ from flask_mail import *
 from datetime import datetime
 import threading
 
+
 app = Flask(__name__)
 app.secret_key = "MY_SUPER_SECRET_KEY"
 
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'taskitMail'
-app.config['MAIL_PASSWORD'] = 'cyberprojectpassword%'
+app.config['MAIL_PASSWORD'] = 'cyberprojectpassword'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
