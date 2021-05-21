@@ -13,7 +13,7 @@ app.secret_key = "MY_SUPER_SECRET_KEY"
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USERNAME'] = 'taskitMail'
-app.config['MAIL_PASSWORD'] = 'cyberprojectpassword'
+app.config['MAIL_PASSWORD'] = 'mlsoybdtjnahqfmt'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
@@ -523,9 +523,9 @@ def notification_center():
 							mail.send(msg)	
 						update_level_alert_status(user.username, level_object.name, project_object.name, 3)	
 
-	threading.Timer(60.0, notification_center).start()
+	threading.Timer(30.0, notification_center).start()
 	
 
 
 if __name__ == '__main__':
-	app.run(debug = True)
+	app.run(debug = False)
