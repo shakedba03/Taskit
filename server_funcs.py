@@ -2,6 +2,8 @@ import datetime as dt
 from datetime import datetime
 from databases import *
 import sys
+import pytz
+
 
 def format_date(date):
     # Gets a str of a date - y-m-d.
@@ -35,7 +37,8 @@ def verify_user_projects(username, projects_list):
 def get_color(end_date):
     # Gets an ending date, retruns a color to show in the cards.
     color = "rgb(26, 168, 8)" # color = green
-    today = datetime.today().strftime("%Y-%m-%d")
+    timezone = pytz.timezone("UTC")
+    today = timezone.localize(datetime.today()).strftime("%Y-%m-%d")
     days_gap = duration_calc(today, end_date)
     if days_gap < 1:
         color = "rgb(223, 2, 2)" # color = red
@@ -72,7 +75,8 @@ def fix_sum_percents(levels_list, p_duration, from_project, username):
 
 def return_closest_due(levels_list):
     # Gets a list of all levels, returns the closest due level.
-    today = datetime.today()
+    timezone = pytz.timezone("UTC")
+    today = timezone.localize(datetime.today())
     closest_due = None
     min_gap = sys.maxsize
     for level in levels_list:
@@ -118,7 +122,8 @@ def get_name_list(items):
 
 def project_submission_alert(user):
     alerts_dict = {}
-    today = datetime.today().strftime("%Y-%m-%d")
+    timezone = pytz.timezone("UTC")
+    today = timezone.localize(datetime.today()).strftime("%Y-%m-%d")
     user_projects = return_user_projects(user.username)
     for project in user_projects:
         if project.percents_ready < 100:
@@ -134,8 +139,8 @@ def project_submission_alert(user):
 
 def level_submission_alert(user, levels):
     alerts_dict = {}
-    today = datetime.today().strftime("%Y-%m-%d")
-
+    timezone = pytz.timezone("UTC")
+    today = timezone.localize(datetime.today()).strftime("%Y-%m-%d")
     for level in levels:
         if not level.is_done:
             end_date = format_date(level.end_date)
@@ -150,7 +155,8 @@ def level_submission_alert(user, levels):
 
 def update_proj_color(username):
     projects = return_user_projects(username)
-    today = datetime.today().strftime("%Y-%m-%d")
+    timezone = pytz.timezone("UTC")
+    today = timezone.localize(datetime.today()).strftime("%Y-%m-%d")
     for project in projects:
         if project.percents_ready != 100:
             end_date = format_date(project.end_date)
@@ -165,7 +171,8 @@ def update_proj_color(username):
 
 def update_level_color(username, project):
     levels = return_project_levels(username, project)
-    today = datetime.today().strftime("%Y-%m-%d")
+    timezone = pytz.timezone("UTC")
+    today = timezone.localize(datetime.today()).strftime("%Y-%m-%d")
     for level in levels:
         end_date = format_date(level.end_date)
         if not level.is_done:
@@ -201,7 +208,8 @@ def find_relevant_recipients(sender, subject):
 def get_late_num():
     users = return_all_users()
     late_counter = 0
-    today = format_date(datetime.today().strftime("%Y-%m-%d"))
+    timezone = pytz.timezone("UTC")
+    today = format_date(timezone.localize(datetime.today()).strftime("%Y-%m-%d"))
     for user in users:
         user_projects = return_user_projects(user.username)
         for project in user_projects:
@@ -229,7 +237,8 @@ def total_active_proj_num():
 def added_monthly():
     users = return_all_users()
     added_counter = 0
-    today = date.today()
+    timezone = pytz.timezone("UTC")
+    today = timezone.localize(datetime.today())
     month = today.month
     for user in users:
         user_projects = return_user_projects(user.username)
@@ -242,7 +251,8 @@ def added_monthly():
 def sent_monthly():
     messages = return_all_messages()
     sent_counter = 0
-    today = date.today()
+    timezone = pytz.timezone("UTC")
+    today = timezone.localize(datetime.today())
     month = today.month
     for message in messages:
         if message.month_added == month:

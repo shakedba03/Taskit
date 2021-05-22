@@ -6,6 +6,7 @@ from flask_mail import *
 from datetime import datetime
 import threading
 from flask_sqlalchemy import SQLAlchemy
+import pytz
 
 
 app = Flask(__name__)
@@ -113,7 +114,8 @@ def new_project(username):
 	if current_user == None:
 		return redirect('/')
 	all_subjects = return_subjects()
-	today = datetime.today().strftime('%Y-%m-%d')
+	timezone = pytz.timezone("UTC")
+	today = timezone.localize(datetime.today()).strftime('%Y-%m-%d')
 	if request.method == 'POST':
 		# Getting the form data - project info.
 		p_name = request.form['name']
@@ -192,7 +194,8 @@ def project_edit(username, project_name):
 	if current_user == None:
 		return redirect('/')
 	# Pulling data from DB.
-	today = datetime.today().strftime('%Y-%m-%d')
+	timezone = pytz.timezone("UTC")
+	today = timezone.localize(datetime.today()).strftime("%Y-%m-%d")
 	all_levels = return_project_levels(current_user.username, project_name)
 	levels_str = make_str_levels(all_levels)
 	project_object = return_project(current_user.username, project_name)
@@ -230,7 +233,8 @@ def level_edit(username, level_name, project_name):
 	if current_user == None:
 		return redirect('/')
 	# Pulling data from DB.
-	today = datetime.today().strftime('%Y-%m-%d')
+	timezone = pytz.timezone("UTC")
+	today = timezone.localize(datetime.today()).strftime("%Y-%m-%d")
 	project = return_project(current_user.username, project_name)
 	project_str = make_str_project(project)
 	levels = return_project_levels(current_user.username, project_name)
