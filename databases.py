@@ -9,7 +9,9 @@ try:
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 except:
-    print("###################################################################################")
+    print("###################################################################################\n************************")
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
 
 def add_user(username, password, email):
     user_object = Users(
