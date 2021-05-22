@@ -62,24 +62,24 @@
               <form action="/signup" method="POST" onsubmit="return verify();">
                 <div class="form-group first">
                   <label for="username" style="position: absolute; right: 5%;">שם משתמש</label>
-                  <input type="text" class="form-control" name="username" id="username">    
+                  <input type="text" class="form-control" name="username" id="username" required>    
 
                 </div>
                 <div class="form-group last mb-4">
                   <label for="password" style="position: absolute; right: 5%;">סיסמה</label>
-                  <input type="password" class="form-control" name ="password" id="password">
+                  <input type="password" class="form-control" name ="password" id="password" required>
                   
                 </div>
 
                 <div class="form-group last mb-4">
                     <label for="password2" style="position: absolute; right: 5%;">אימות סיסמה</label>
-                    <input type="password" class="form-control" name ="password2" id="password2">
+                    <input type="password" class="form-control" name ="password2" id="password2" required>
                     
                 </div>
                 
                 <div class="form-group last mb-4">
                     <label for="email" style="position: absolute; right: 5%;">אימייל</label>
-                    <input type="email" class="form-control" name ="email" id="email">
+                    <input type="email" class="form-control" name ="email" id="email" required>
                     
                 </div>
                 <input type="submit" value="כניסה" class="btn btn-block btn-primary">
