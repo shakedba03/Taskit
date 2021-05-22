@@ -129,7 +129,14 @@ def return_project(owner, name):
 def update_percents(owner, name, percents):
     
     project = session.query(Projects).filter_by(owner = owner, name = name).first()
-    if project.percents_ready + percents > 100:
+    levels = return_project_levels(owner, project.name)
+    is_done = True
+    
+    for level in levels:
+        if level.is_done == False:
+            is_done = False
+
+    if project.percents_ready + percents > 100 or is_done:
         project.percents_ready = 100
         reduce_active_projects(owner)
     else:
