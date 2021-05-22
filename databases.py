@@ -9,10 +9,9 @@ try:
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 except:
-    print("###################################################################################\n********************************************************************")
+    print("###################################################################################")
 
 def add_user(username, password, email):
-    session = DBSession()
     user_object = Users(
     username = username,
     password = password,
@@ -25,31 +24,31 @@ def add_user(username, password, email):
 
 
 def delete_user_from_db(id):
-    session = DBSession()
+    
     session.query(Users).filter_by(id = id).delete()
     session.commit()
 
 
 def return_all_users():
-    session = DBSession()
+    
     users = session.query(Users).all()
     return users
 
 
 def return_user(username):
-    session = DBSession()
+    
     user = session.query(Users).filter_by(username = username).first()
     return user
 
 
 def return_user_by_id(id):
-    session = DBSession()
+    
     user = session.query(Users).filter_by(id = id).first()
     return user
 
 
 def update_active_proj_num(username):
-    session = DBSession()
+    
     user_object = session.query(Users).filter_by(username = username).first()
     user_object.active_projects += 1
     user_object.total_porject_num += 1
@@ -57,35 +56,35 @@ def update_active_proj_num(username):
 
 
 def reduce_active_projects(username):
-    session = DBSession()
+    
     user_object = session.query(Users).filter_by(username = username).first()
     user_object.active_projects -= 1
     session.commit()
 
 
 def reduce_total_proj_num(username):
-    session = DBSession()
+    
     user_object = session.query(Users).filter_by(username = username).first()
     user_object.total_porject_num -= 1
     session.commit()
 
 
 def block_user_forums(id):
-    session = DBSession()
+    
     user_object = session.query(Users).filter_by(id = id).first()
     user_object.is_blocked = True
     session.commit()
 
 
 def unblock_user(id):
-    session = DBSession()
+    
     user_object = session.query(Users).filter_by(id = id).first()
     user_object.is_blocked = False
     session.commit()
 
 
 def return_emails():
-    session = DBSession()
+    
     users = session.query(Users).all()
     emails = []
     for user in users:
@@ -93,7 +92,7 @@ def return_emails():
     return emails
 #############################################################################################################
 def add_project(name, subject, start_date, end_date, duration, description, owner, color, percents_ready):
-    session = DBSession()
+    
     project_object = Projects(
     name = name,
     subject = subject,
@@ -114,19 +113,19 @@ def add_project(name, subject, start_date, end_date, duration, description, owne
 
 
 def return_user_projects(owner):
-    session = DBSession()
+    
     projects = session.query(Projects).filter_by(owner = owner).all()
     return projects
 
 
 def return_project(owner, name):
-    session = DBSession()
+    
     project = session.query(Projects).filter_by(owner = owner, name = name).first()
     return project
 
 
 def update_percents(owner, name, percents):
-    session = DBSession()
+    
     project = session.query(Projects).filter_by(owner = owner, name = name).first()
     if project.percents_ready + percents > 100:
         project.percents_ready = 100
@@ -137,14 +136,14 @@ def update_percents(owner, name, percents):
 
 
 def update_p_color(owner, name, color):
-    session = DBSession()
+    
     project = session.query(Projects).filter_by(owner = owner, name = name).first()
     project.color = color
     session.commit()
 
 
 def edit_project(username, name, new_name, s_date, e_date, subject, descrip):
-    session = DBSession()
+    
     project_object = session.query(Projects).filter_by(owner = username, name = name).first()
     if new_name:
         project_object.name = new_name
@@ -160,14 +159,14 @@ def edit_project(username, name, new_name, s_date, e_date, subject, descrip):
     
 
 def update_project_duration(username, p_name, new_duration):
-    session = DBSession()
+    
     project_object = session.query(Projects).filter_by(owner = username, name = p_name).first()
     project_object.duration = new_duration
     session.commit()
 
 
 def delete_project(owner, project_name):
-    session = DBSession()
+    
     reduce_total_proj_num(owner)
     project = return_project(owner, project_name)
     user = return_user(owner)
@@ -178,13 +177,13 @@ def delete_project(owner, project_name):
 
 
 def delete_all_projects(owner):
-    session = DBSession()
+    
     session.query(Projects).filter_by(owner = owner).delete()
     session.commit()
 
 
 def update_alert_status(owner, name, alert_num):
-    session = DBSession()
+    
     project_object = session.query(Projects).filter_by(owner = owner, name = name).first()
     if alert_num == 1:
         project_object.first_alert = True
@@ -195,7 +194,7 @@ def update_alert_status(owner, name, alert_num):
     session.commit()
 #############################################################################################################
 def add_level(name, level_num, start_date, end_date, duration, description, from_project, owner, color):
-    session = DBSession()
+    
     level_object = Levels(
     name = name,
     level_num = level_num,
@@ -216,31 +215,31 @@ def add_level(name, level_num, start_date, end_date, duration, description, from
 
 
 def return_project_levels(owner, from_project):
-    session = DBSession()
+    
     levels = session.query(Levels).filter_by(owner = owner, from_project = from_project ).all()
     return levels
 
 
 def return_level(owner, level_name, from_project):
-    session = DBSession()
+    
     level = session.query(Levels).filter_by(owner = owner, name = level_name, from_project = from_project).first()
     return level
 
 
 def update_level_percents(owner, from_project, name, project_duration, new_duration):
-    session = DBSession()
+    
     level_object = session.query(Levels).filter_by(owner = owner, from_project = from_project, name = name).first()
     level_object.percent = round((new_duration / project_duration) * 100)
     session.commit()
 
 def update_level_duration(owner, from_project, name, new_level_duration):
-    session = DBSession()
+    
     level_object = session.query(Levels).filter_by(owner = owner, from_project = from_project, name = name).first()
     level_object.duration = new_level_duration
     session.commit()
 
 def update_l_color(owner, from_project, name, color):
-    session = DBSession()
+    
     level = session.query(Levels).filter_by(owner = owner, from_project = from_project, name = name).first()
     level.color = color
     session.commit()
@@ -254,7 +253,7 @@ def update_from_proj(username, prev_name, new_name):
         session.commit()
 
 def update_level_alert_status(owner, name, from_project, alert_num):
-    session = DBSession()
+    
     project_object = session.query(Levels).filter_by(owner = owner, name = name, from_project = from_project).first()
     if alert_num == 1:
         project_object.first_alert = True
@@ -265,7 +264,7 @@ def update_level_alert_status(owner, name, from_project, alert_num):
     session.commit()
 
 def edit_level(owner, from_project, name, new_name, is_done_changed , s_date, e_date, descrip):
-    session = DBSession()
+    
     level_object = session.query(Levels).filter_by(from_project = from_project, name = name, owner = owner).first()
     if new_name != "":
         level_object.name = new_name
@@ -281,25 +280,25 @@ def edit_level(owner, from_project, name, new_name, is_done_changed , s_date, e_
 
 
 def delete_all_levels(owner, project_name):
-    session = DBSession()
+    
     session.query(Levels).filter_by(owner = owner, from_project = project_name).delete()
     session.commit()
 
 
 def delete_all_user_levels(owner):
-    session = DBSession()
+    
     session.query(Levels).filter_by(owner = owner).delete()
     session.commit()
 
 
 def delete_level(owner, project_name, level_name, level_num):
-    session = DBSession()
+    
     session.query(Levels).filter_by(owner = owner, from_project = project_name, name = level_name,
     level_num = level_num).delete()
     session.commit()
 ############################################################################################################
 def add_subjects(name_list):
-    session = DBSession()
+    
     for name in name_list:
         subject_object = Subjects(name = name)
         session.add(subject_object)
@@ -307,7 +306,7 @@ def add_subjects(name_list):
 
 
 def add_subject(name):
-    session = DBSession()
+    
     all_subjects = return_subjects()
     existed = False
     for subject in all_subjects:
@@ -320,19 +319,19 @@ def add_subject(name):
 
 
 def return_subjects():
-    session = DBSession()
+    
     subjects = session.query(Subjects).all()
     return subjects
 
 
 def delete_subject(id):
-    session = DBSession()
+    
     session.query(Subjects).filter_by(id = id).delete()
     session.commit()
 #############################################################################################################
 
 def open_new_chat(title, content, user, date, hour, subject):
-    session = DBSession()
+    
     chat_object = Chats(
         title = title,
         content = content,
@@ -347,7 +346,7 @@ def open_new_chat(title, content, user, date, hour, subject):
 heading_counter = 1
 def return_chats_dict(subjects_list):
     global heading_counter
-    session = DBSession()
+    
     chats_dict = {}
     for subject in subjects_list:
         subjects_key = (subject, heading_counter)
@@ -357,39 +356,39 @@ def return_chats_dict(subjects_list):
 
 
 def return_chat(chat_id):
-    session = DBSession()
+    
     chat = session.query(Chats).filter_by(id = chat_id).first()
     return chat
 
 
 def return_chat_messages(from_chat, subject, chat_id):
-    session = DBSession()
+    
     message_list = session.query(Messages).filter_by(chat_id = chat_id, from_chat = from_chat, subject = subject).all()
     return message_list
 
 
 def return_all_chats():
-    session = DBSession()
+    
     list = session.query(Chats).all()
     chats = [x for x in list[::-1]]
     return chats
 
 
 def delete_chat_DB(id, chat_name):
-    session = DBSession()
+    
     session.query(Messages).filter_by(from_chat = chat_name, chat_id = id).delete()
     session.query(Chats).filter_by(id = id).delete()
     session.commit()
 
 
 def update_num_messages(id):
-    session = DBSession()
+    
     chat = session.query(Chats).filter_by(id = id).first()
     chat.num_messages += 1
     session.commit()
 #############################################################################################################
 def add_message(content, user, date_input, hour, subject, from_chat, chat_id):
-    session = DBSession()
+    
     message_object = Messages(
         content = content,
         user = user,
@@ -404,6 +403,6 @@ def add_message(content, user, date_input, hour, subject, from_chat, chat_id):
 
 
 def return_all_messages():
-    session = DBSession()
+    
     messages = session.query(Messages).all()
     return messages
