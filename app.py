@@ -397,18 +397,18 @@ def data():
 
 @app.route('/delete_user', methods=['POST'])
 def delete_user():
-	# Deleting a user by the Admin
 	user_id = request.form["user_id"]
 	user = return_user_by_id(user_id)
-	delete_all_projects(user.username)
-	delete_all_user_levels(user.username)
-	delete_user_from_db(user_id)
 	# Notifying the user 
 	sub_line = "הודעה על הסרת חשבון"
 	msg = Message(sub_line, sender = 'taskitMail@gmail.com', recipients = [user.email])
 	msg.html = "<h3 dir='rtl'> זוהי הודעה על מחיקת חשבונך על ידי מנהל האתר. במידה ומדובר בטעות, השב להודעה זו.</h3>"
 	with app.app_context():
 		mail.send(msg)
+	# Deleting a user by the Admin
+	delete_all_projects(user.username)
+	delete_all_user_levels(user.username)
+	delete_user_from_db(user_id)
 	return redirect('/users_table')
 
 
