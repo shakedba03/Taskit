@@ -3,11 +3,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import date
 
-engine = create_engine('sqlite:///database.db', connect_args={'check_same_thread': False})
-Base.metadata.create_all(engine)
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
-
+try:
+    engine = create_engine('sqlite:///database.db', connect_args={'check_same_thread': False})
+    Base.metadata.create_all(engine)
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+except:
+    print("###################################################################################\n********************************************************************")
 
 def add_user(username, password, email):
     session = DBSession()
