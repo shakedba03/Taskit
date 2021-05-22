@@ -85,6 +85,8 @@ def manage_user_cookies():
 @app.route('/projects/<username>', methods=['GET', 'POST'])
 def projects(username):
 	current_user = return_user(username)
+	if current_user == None:
+		return redirect('/')
 	update_proj_color(current_user.username)
 	if request.method == 'POST':
 		# Get the project out of the DB
