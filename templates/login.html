@@ -22,11 +22,6 @@
   <body >
     <script>
       function encrypt_data(){
-        var password = document.getElementsByName("password")[0];
-        var hashed = md5(password.value);
-        password.value = hashed;
-        var username = document.getElementsByName("username")[0];
-        var cvalue = username.value;
         setCookie("username_cookie", cvalue, 1);
       }
     </script>

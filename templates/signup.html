@@ -42,20 +42,9 @@
             alert("אורך הסיסמה חייב להיות עשרה תווים לפחות.");
             isValid3 = false;;
         }
-        if (isValid1 && isValid2 && isValid3){
-            encrypt_data();
-        }
         
         return isValid1 && isValid2 && isValid3;
     }
-      function encrypt_data(){
-        var password = document.getElementsByName("password")[0];
-        var hashed = md5(password.value);
-        password.value = hashed;
-        var password2 = document.getElementsByName("password2")[0];
-        var hashed2 = md5(password2.value);
-        password2.value = hashed2;
-      }
     </script>
     <div class="content" style="position: absolute; top: 15%; left: 10%;">
       <div class="container">

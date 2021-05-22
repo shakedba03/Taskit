@@ -5,6 +5,7 @@ from server_funcs import *
 from flask_mail import *
 from datetime import datetime
 import threading
+from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
@@ -16,7 +17,8 @@ app.config['MAIL_USERNAME'] = 'taskitMail'
 app.config['MAIL_PASSWORD'] = 'mlsoybdtjnahqfmt'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
-
+db = SQLAlchemy(app)
+db.app = app
 mail = Mail(app)
 
 
@@ -30,14 +32,14 @@ def index():
 		add_subjects(default_subjects)
 	admin = return_user("taskitAdmin")
 	if not admin:
-		add_user("taskitAdmin", "80261d757fbd1902559576f23a6c4968", "taskitmail@gmail.com")
+		add_user("taskitAdmin", "taskitAdmin", "taskitmail@gmail.com")
 	msg = ""
 	if request.method == 'POST':
 		username = request.form['username']
 		password = request.form['password']
 		users_list = return_all_users()
 
-		if username == "taskitAdmin" and password == "80261d757fbd1902559576f23a6c4968":
+		if username == "taskitAdmin" and password == "taskitAdmin":
 			return redirect("/data")
 		
 		for user in users_list:
@@ -528,4 +530,5 @@ def notification_center():
 
 
 if __name__ == '__main__':
+	db.create_all()
 	app.run(debug = False)
