@@ -9,7 +9,6 @@ try:
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 except:
-    print("###################################################################################\n************************")
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
 

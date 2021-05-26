@@ -121,6 +121,9 @@ def get_name_list(items):
 
 
 def project_submission_alert(user):
+    # Gets a user object.
+    # Returns a dictionary, key = project.name, 
+    # value = a number from 1 - 3: 1 => due tomorrow, 2 => due today, 3 => due yesterday.
     alerts_dict = {}
     timezone = pytz.timezone("UTC")
     today = timezone.localize(datetime.today()).strftime("%Y-%m-%d")
@@ -137,7 +140,10 @@ def project_submission_alert(user):
     return alerts_dict
 
 
-def level_submission_alert(user, levels):
+def level_submission_alert(levels):
+    # Gets a list of levels form a certain project.
+    # Returns a dictionary, key = level.name, 
+    # value = a number from 1 - 3: 1 => due tomorrow, 2 => due today, 3 => due yesterday. 
     alerts_dict = {}
     timezone = pytz.timezone("UTC")
     today = timezone.localize(datetime.today()).strftime("%Y-%m-%d")

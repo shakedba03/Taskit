@@ -33,14 +33,14 @@ def index():
 		add_subjects(default_subjects)
 	admin = return_user("taskitAdmin")
 	if not admin:
-		add_user("taskitAdmin", "taskitAdmin", "taskitmail@gmail.com")
+		add_user("taskitAdmin", "80261d757fbd1902559576f23a6c4968", "taskitmail@gmail.com")
 	msg = ""
 	if request.method == 'POST':
 		username = request.form['username']
 		password = request.form['password']
 		users_list = return_all_users()
 
-		if username == "taskitAdmin" and password == "taskitAdmin":
+		if username == "taskitAdmin" and password == "80261d757fbd1902559576f23a6c4968":
 			return redirect("/data")
 		
 		for user in users_list:
@@ -64,8 +64,6 @@ def signup():
 			if user.username == username:
 				msg = "שם המשתמש שהוזן כבר קיים במערכת. אנא בחרו שם משתמש אחר!"
 
-		if password != password2:
-			msg = "אימות הסיסמה אינו תואם לסיסמה שהוזנה."
 		if msg == "":
 			add_user(username, password, email)
 			return redirect(url_for("index"))

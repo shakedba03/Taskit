@@ -23,7 +23,9 @@
     <script>
     function verify(){
         var username = document.getElementsByName("username")[0];
+        var password_show = document.getElementsByName("password_show")[0];
         var password = document.getElementsByName("password")[0];
+        password.value = md5(password_show.value);
         var password2 = document.getElementsByName("password2")[0];
         
         var isValid1 = true;
@@ -33,12 +35,12 @@
             alert("שם המשתמש חייב להיות עד שמונה תווים בלבד.");
             isValid1 = false;
         }
-        if (password.value != password2.value){
+        if (password_show.value != password2.value){
             alert("אימות הסיסמה לא תואם לסיסמה שהוזנה.");
             isValid2 = false;
         }
-        var password = document.getElementsByName("password")[0].value;
-        if (password.length < 10){
+        var password_show = document.getElementsByName("password")[0].value;
+        if (password_show.length < 10){
             alert("אורך הסיסמה חייב להיות עשרה תווים לפחות.");
             isValid3 = false;;
         }
@@ -67,7 +69,8 @@
                 </div>
                 <div class="form-group last mb-4">
                   <label for="password" style="position: absolute; right: 5%;">סיסמה</label>
-                  <input type="password" class="form-control" name ="password" id="password" required>
+                  <input type="hidden" class="form-control" name ="password" id="password">
+                  <input type="password" class="form-control" name ="password_show" id="password_show" required>
                   
                 </div>
 
