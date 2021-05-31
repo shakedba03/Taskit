@@ -48,7 +48,14 @@ def index():
 			return redirect("/data")
 		
 		for user in users_list:
-			if user.username == username and user.password == password.decode('UTF-8'):
+			print("USER DB USERNAME: " + user.username)
+			print(username)
+			print(username == user.username)
+			print("##############################################")
+			print("USER DB PASSWORD: " + user.password)
+			print(password)
+			print(password == user.password)
+			if user.username == username and user.password == password:
 				
 				return redirect(url_for('projects', username = username))
 		msg = "פרטי הכניסה שגויים"
