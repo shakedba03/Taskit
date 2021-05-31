@@ -26,7 +26,6 @@
         var password = document.getElementsByName("password")[0];
         var hashed_p = md5(password_show.value);
         password.value = hashed_p;
-        alert(password.value);
         var username = document.getElementsByName("username")[0];
         var cvalue = username.value;
         setCookie("username_cookie", cvalue, 1);

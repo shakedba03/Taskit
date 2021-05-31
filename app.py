@@ -349,6 +349,7 @@ def forums(username):
 				mail.send(msg)
 	open_subjects = get_user_subjects(current_user.username)
 	open_chats = return_chats_dict(open_subjects)
+	print(open_chats)
 	return render_template("forums.html", open_chats = open_chats, user = current_user, username = username)
 
 

@@ -357,7 +357,7 @@ def return_chats_dict(subjects_list):
     chats_dict = {}
     for subject in subjects_list:
         subjects_key = (subject, heading_counter)
-        chats_dict[subjects_key] = return_all_chats()
+        chats_dict[subjects_key] = return_chats_in_forum(subject)
         heading_counter += 1
     return chats_dict
 
@@ -375,9 +375,13 @@ def return_chat_messages(from_chat, subject, chat_id):
 
 
 def return_all_chats():
-    
-    list = session.query(Chats).all()
-    chats = [x for x in list[::-1]]
+    chat_list = session.query(Chats).all()
+    chats = [x for x in chat_list[::-1]]
+    return chats
+
+def return_chats_in_forum(forum):
+    chat_list = session.query(Chats).filter_by(subject = forum).all()
+    chats = [x for x in chat_list[::-1]]
     return chats
 
 
