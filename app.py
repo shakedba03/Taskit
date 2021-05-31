@@ -37,18 +37,18 @@ def index():
 		
 	admin = return_user("taskitAdmin")
 	if not admin:
-		add_user("taskitAdmin", "80261d757fbd1902559576f23a6c4968", "taskitmail@gmail.com")
+		add_user("taskitAdmin", "80261d757fbd1902559576f23a6c4968".encode('UTF-8'), "taskitmail@gmail.com")
 	msg = ""
 	if request.method == 'POST':
 		username = request.form['username']
 		password = request.form['password']
 		users_list = return_all_users()
 
-		if username == "taskitAdmin" and password == "80261d757fbd1902559576f23a6c4968":
+		if username == "taskitAdmin" and password == "80261d757fbd1902559576f23a6c4968".encode('UTF-8'):
 			return redirect("/data")
 		
 		for user in users_list:
-			if user.username == username and user.password == password:
+			if user.username == username and user.password.encode('UTF-8') == password.encode('UTF-8'):
 				
 				return redirect(url_for('projects', username = username))
 		msg = "פרטי הכניסה שגויים"
