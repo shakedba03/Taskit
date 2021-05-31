@@ -266,3 +266,20 @@ def sent_monthly():
     return sent_counter
 
 
+def add_content():
+    add_user("עומר", "e807f1fcf82d132f9bb018ca6738a19f", "shakedba03@gmail.com")
+    add_user("שני", "e807f1fcf82d132f9bb018ca6738a19f", "shakedba03@gmail.com")
+    add_user("קרן", "e807f1fcf82d132f9bb018ca6738a19f", "shakedba03@gmail.com")
+    
+    title = "מבנה הבגרות"
+    content = "מה מבנה הבגרות?"
+    date_1 = "22/5/2021"
+    hour = "10:45"
+    user = "עומר"
+    subjects = return_subjects()
+    
+    for subject in subjects:
+        print(subject.name)
+        open_new_chat(title, content, user, date_1, hour, subject.name)
+        
+

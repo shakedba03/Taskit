@@ -354,7 +354,6 @@ def open_new_chat(title, content, user, date, hour, subject):
 heading_counter = 1
 def return_chats_dict(subjects_list):
     global heading_counter
-    
     chats_dict = {}
     for subject in subjects_list:
         subjects_key = (subject, heading_counter)

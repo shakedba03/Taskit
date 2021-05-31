@@ -31,6 +31,10 @@ def index():
 	check_subjects = return_subjects()
 	if not check_subjects:
 		add_subjects(default_subjects)
+	check_content = return_all_users()
+	if not check_content:
+		add_content()
+		
 	admin = return_user("taskitAdmin")
 	if not admin:
 		add_user("taskitAdmin", "80261d757fbd1902559576f23a6c4968", "taskitmail@gmail.com")
@@ -506,7 +510,7 @@ def notification_center():
 		user_total_projects = return_user_projects(user.username)
 		for project_object in user_total_projects:
 			levels = return_project_levels(user.username, project_object.name)	
-			levels_alerts = level_submission_alert(user, levels)
+			levels_alerts = level_submission_alert(levels)
 			if len(levels_alerts.keys()) > 0:
 				for level in levels_alerts:
 					level_object = return_level(user.username, level, project_object.name)
