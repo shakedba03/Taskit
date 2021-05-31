@@ -48,7 +48,7 @@ def index():
 			return redirect("/data")
 		
 		for user in users_list:
-			if user.username == username.decode('UTF-8') and user.password.decode('UTF-8') == password.decode('UTF-8'):
+			if user.username == username and user.password.decode('UTF-8') == password.decode('UTF-8'):
 				
 				return redirect(url_for('projects', username = username))
 		msg = "פרטי הכניסה שגויים"
