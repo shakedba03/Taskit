@@ -390,6 +390,8 @@ def data():
 	late_num = get_late_num()
 	all_projects = total_proj_num()
 	active_projects = total_active_proj_num()
+	if active_projects < 0:
+		active_projects = 0
 	added = added_monthly()
 	num_chats = len(return_all_chats())
 	sent = sent_monthly()
